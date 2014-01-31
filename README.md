@@ -2,6 +2,7 @@
 by modeverv
 
 # REQUIREMENTS
+ruby 1.9.3
 MongoDB
 sinatra
 sinatra-reloader
