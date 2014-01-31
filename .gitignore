@@ -4,5 +4,7 @@ tmp/pids/*
 tmp/sessions/*
 tmp/sockets/*
 tmp/musicdb_dev/*
+*.log
+*_flymake*
 
 

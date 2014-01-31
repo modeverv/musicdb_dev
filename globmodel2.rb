@@ -5,16 +5,15 @@ class GlobServerFiles
   def initialize args={}
     @count = 0
     @folders = args[:folders] ||= [
-#                                   "/var/smb/sdb1/music/iTunesMac/BAIDOKU",
-#                                   "/var/smb/sdb1/music/iTunes1",
-#                                   "/var/smb/sdb1/music/iTunes2",
-#                                   "/var/smb/sdb1/music/iTunes3",
-#                                   "/var/smb/sdb1/music/iTunes2011",
-#                                   "/var/smb/sdb1/music/iTunesMac",
-#                                   "/var/smb/sdb1/music/iTunesLossless",
-#                                   "/var/smb/sdb1/video2/作成",
-#                                   "/var/smb/sdb1/music/iTunes2012",
-#                                   "/var/smb/sdb1/music/iTunes2013",
+                                   "/var/smb/sdb1/music/iTunes1",
+                                   "/var/smb/sdb1/music/iTunes2",
+                                   "/var/smb/sdb1/music/iTunes3",
+                                   "/var/smb/sdb1/music/iTunesMac",
+                                   "/var/smb/sdb1/music/iTunesLossless",
+                                   "/var/smb/sdb1/video2/作成",
+                                   "/var/smb/sdb1/music/iTunes2011",
+                                   "/var/smb/sdb1/music/iTunes2012",
+                                   "/var/smb/sdb1/music/iTunes2013",
                                    "/var/smb/sdb1/music/iTunes2014",
                                   ]
     @ext = args[:ext] ||= [
@@ -30,16 +29,15 @@ class GlobServerFiles
   
   def self.data(args = {})
     @folders = args[:folders] ||= [
-#                                   "/var/smb/sdb1/music/iTunesMac/BAIDOKU",
-#                                   "/var/smb/sdb1/music/iTunes1",
-#                                   "/var/smb/sdb1/music/iTunes2",
-#                                   "/var/smb/sdb1/music/iTunes3",
-#                                   "/var/smb/sdb1/music/iTunes2011",
-#                                   "/var/smb/sdb1/music/iTunesMac",
-#                                   "/var/smb/sdb1/music/iTunesLossless",
-#                                   "/var/smb/sdb1/video2/作成",
-#                                   "/var/smb/sdb1/music/iTunes2012",
-#                                   "/var/smb/sdb1/music/iTunes2013",
+                                  "/var/smb/sdb1/music/iTunes1",
+                                  "/var/smb/sdb1/music/iTunes2",
+                                  "/var/smb/sdb1/music/iTunes3",
+                                  "/var/smb/sdb1/music/iTunes2011",
+                                  "/var/smb/sdb1/music/iTunesMac",
+                                  "/var/smb/sdb1/music/iTunesLossless",
+                                  "/var/smb/sdb1/video2/作成",
+                                  "/var/smb/sdb1/music/iTunes2012",
+                                  "/var/smb/sdb1/music/iTunes2013",
                                    "/var/smb/sdb1/music/iTunes2014",
                                   ]
     @ext = args[:ext] ||= [
@@ -79,8 +77,6 @@ class GlobServerFiles
   def each
     @folders.each do |folder|
       @ext.each do |ext|
-        puts folder
-        puts ext 
         Dir.glob("#{folder}/**/*.#{ext.downcase}") do |element|
           @count += 1
           # puts "down - #{@count} - #{element}"

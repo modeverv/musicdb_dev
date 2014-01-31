@@ -4,13 +4,15 @@ require 'bson'
 require 'mongo'
 require 'mongoid'
 require 'kconv'
-require 'MeCab'
-#require 'taglib'
+#require 'MeCab'
+require 'mecab'
+require 'taglib'
 require 'taglib2'
 require 'mp3info'
 require File.dirname(__FILE__) + '/audioinfo_mod.rb'
 require File.dirname(__FILE__)+'/globmodel2.rb'
 require 'tempfile'
+require 'pp'
 
 =begin
 module Mongoid
@@ -26,12 +28,14 @@ module Mongoid
 
 end
 =end
-
-#Mongoid.load!( File.dirname(__FILE__) + "/mongoid.yml",:production)
-Mongoid.configure do |config|
-  config.master = Mongo::Connection.new('localhost').db('misic-mongoid')
-# config.master = Mongo::Connection.new('localhost').db('photo-mongoid2')
-  config.identity_map_enabled = true
+begin
+  Mongoid.load!( File.dirname(__FILE__) + "/mongoid.yml",:production)
+rescue
+  Mongoid.configure do |config|
+    config.master = Mongo::Connection.new('localhost').db('misic-mongoid')
+    # config.master = Mongo::Connection.new('localhost').db('photo-mongoid2')
+    #  config.identity_map_enabled = true
+  end
 end
 
 class Mid
@@ -207,7 +211,7 @@ class Musicmodel
     puts ex
     [{:status => 'ng',:page => 0,:next => "no",:prev => "no"},[{}]]
   end
-
+  
   def force_utf8
     self.genre = self.genre.toutf8
     self.artist= self.artist.toutf8
@@ -266,23 +270,25 @@ class Musicmodel
     if File.extname(self.path).downcase != '.wav'
       begin #audioinfo is slow. use taglib2
         if self.title == '' # is fail by taglib2
-          tag =  TagLib2::File.new(self.path.to_str)
-          self.genre  = tag.genre.to_s.toutf8     if tag.genre
-          self.artist = tag.artist.to_s.toutf8    if tag.artist
-          self.album  = tag.album.to_s.toutf8     if tag.album
-          self.title  = tag.title.to_s.toutf8     if tag.title
-          if tag.image
-            path = nil
-            tmp = Tempfile.open(['tm','image'],'/tmp') do |io|
-              io.puts "#EXTM3U"
-              io.puts tag.image.data
-              path = io.path
-            end
-            buff_m = `convert -define jpeg:size=200x200 -resize 200x200 -quality 90 -strip "#{path}" -`
-            self.thumb = [buff_m].pack('m')
-          end
+          puts "try taglib2"
+          tag = ::TagLib2::File.new(self.path.to_str)
+          self.genre  = tag.genre.to_s.toutf8  if tag.genre
+          self.artist = tag.artist.to_s.toutf8 if tag.artist
+          self.album  = tag.album.to_s.toutf8  if tag.album
+          self.title  = tag.title.to_s.toutf8  if tag.title
+#          if tag.image
+#            path = nil
+#            tmp = Tempfile.open(['tm','image'],'/tmp') do |io|
+#              io.puts "#EXTM3U"
+#              io.puts tag.image.data
+#              path = io.path
+#            end
+#            buff_m = `convert -define jpeg:size=200x200 -resize 200x200 -quality 90 -strip "#{path}" -`
+#            self.thumb = [buff_m].pack('m')
+#          end
         end
       rescue => ex
+        puts "tablib2"
         p ex
       ensure
         buff_m = nil
@@ -290,19 +296,20 @@ class Musicmodel
 
       begin
         if self.title == '' # is fail by taglib2
-          debug "try audioinfo"
+          puts "try audioinfo"
           AudioInfo.open("#{self.path}") do |tag|
             debug tag.to_h  # { "artist" => "artist", "title" => "title", etc... }
-            self.genre  = tag.genre.to_s.toutf8     if tag.genre
-            self.artist = tag.artist.to_s.toutf8    if tag.artist
-            self.album  = tag.album.to_s.toutf8     if tag.album
-            self.title  = tag.title.to_s.toutf8     if tag.title
+            self.genre  = tag.genre.to_s.toutf8  if tag.genre
+            self.artist = tag.artist.to_s.toutf8 if tag.artist
+            self.album  = tag.album.to_s.toutf8  if tag.album
+            self.title  = tag.title.to_s.toutf8  if tag.title
           end
         end
       rescue AudioInfoError => ex
         p ex
         p tag
       rescue =>ex
+        puts "try audioinfo"        
         p ex
         p tag
       end
@@ -312,13 +319,14 @@ class Musicmodel
           debug "try mp3info"
           Mp3Info.open(self.path) do |mp3|
             tag = mp3.tag
-            self.genre  = tag.genre.to_s.toutf8     if tag.genre
-            self.artist = tag.artist.to_s.toutf8    if tag.artist
-            self.album  = tag.album.to_s.toutf8     if tag.album
-            self.title  = tag.title.to_s.toutf8     if tag.title
+            self.genre  = tag.genre.to_s.toutf8  if tag.genre
+            self.artist = tag.artist.to_s.toutf8 if tag.artist
+            self.album  = tag.album.to_s.toutf8  if tag.album
+            self.title  = tag.title.to_s.toutf8  if tag.title
           end
         end
       rescue => ex
+        puts "try mp3info"
         p ex
       end
     end
@@ -352,8 +360,8 @@ class Musicmodel
     end
     
     def deug(a)
-#      require 'pp'
-#      pp a
+      require 'pp'
+      pp a
     end
 
     def _update_db entries
@@ -396,7 +404,7 @@ class Musicmodel
 #                                     "/var/smb/sdb1/music/iTunesLossless",
 #                                     "/var/smb/sdb1/video2/作成",
 #                                     "/var/smb/sdb1/music/iTunes2012",
-                                     "/var/smb/sdb1/music/iTunes2013",
+#                                     "/var/smb/sdb1/music/iTunes2013",
                                      "/var/smb/sdb1/music/iTunes2014",
 #                                    "/var/smb/sdb1/music"
                                    ]
@@ -440,7 +448,7 @@ class Musicmodel
     end
 
     def update_db
-      # debug_delete_all
+#      debug_delete_all
       
       delete_not_exist_entry
       
