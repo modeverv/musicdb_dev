@@ -73,7 +73,7 @@ app.get("/stream/musicdb/:mid/:param",function(req,res){
     catch ( error ) {
         ip_address = req.connection.remoteAddress;
     }
-    var lines = ["192"]; 
+    var lines = ["192|124\.110\.137"]; 
     var reg = new RegExp(lines[0]);
     if (reg.test(ip_address)){
   	  console.log("ip is local.ok!");

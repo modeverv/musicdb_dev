@@ -1,6 +1,6 @@
 /* reset */
 /*@import url(http://fonts.googleapis.com/css?family=Josefin+Sans|Rock+Salt|Shadows+Into+Light);*/
-@import url(http://fonts.googleapis.com/css?family=Josefin+Sans|Rock+Salt|Gochi+Hand);
+@import url(//fonts.googleapis.com/css?family=Josefin+Sans|Rock+Salt|Gochi+Hand);
 
 html,body {
    overflow:none;

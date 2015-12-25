@@ -2,7 +2,7 @@
 
 cd /home/seijiro/sinatra/musicdb_dev/
 
-source /home/seijiro/.rvm/environments/ruby-1.9.3-p392
+#source /home/seijiro/.rvm/environments/ruby-1.9.3-p392
 echo `which ruby`
 echo `ruby -v`
 echo `rvm gemset list`

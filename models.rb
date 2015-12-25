@@ -405,7 +405,8 @@ class Musicmodel
 #                                     "/var/smb/sdb1/video2/作成",
 #                                     "/var/smb/sdb1/music/iTunes2012",
 #                                     "/var/smb/sdb1/music/iTunes2013",
-                                     "/var/smb/sdb1/music/iTunes2014",
+#                                     "/var/smb/sdb1/music/iTunes2014",
+                                     "/var/smb/sdb1/music/iTunes2015",
 #                                    "/var/smb/sdb1/music"
                                    ]
       ext = args[:ext] ||= [
@@ -450,7 +451,7 @@ class Musicmodel
     def update_db
 #      debug_delete_all
       
-      delete_not_exist_entry
+      delete_not_exist_entry # 不要
       
       #entries = globes
       entries = GlobServerFiles.new

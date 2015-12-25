@@ -8,6 +8,7 @@ function log(msg){
 //    console.log(msg);
 }
 jQuery(function ($) {
+//function hoge() {
 	// redirect the old bitches
 	if(!Modernizr.canvas) {
 //		jQuery('#tweet').html('<h1>oh noez - please get yourself a sophisticated browser like <a href="http://getfirefox.com">FireFox 3.5</a>, <a href="http://apple.com/safari">Safari</a>, <a href="http://www.opera.com/">Opera</a> or <a href="http://google.com/chrome">Chrome</a> </h1>');
@@ -376,3 +377,4 @@ jQuery(function ($) {
 
 	}
 });
+//};

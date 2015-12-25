@@ -11,6 +11,11 @@ require 'padrino-cache'
 #require 'sinatra/reloader'
 require 'digest'
 
+Padrino.configure_apps do
+  set :protection, false
+  set :protect_from_csrf, false
+end
+
 =begin
 module Padrino
   module Cache
@@ -97,7 +102,6 @@ require 'kconv'
 require 'uri'
 require 'json'
 
-
 ##########################################################################################
 ##########################################################################################
 def get_prefix
@@ -109,10 +113,14 @@ Encoding.default_internal = Encoding.find("UTF-8")
 
 class MyApp < Sinatra::Application
   set :app_name, "musicdb_dev"
+  set :protection, :except => [:http_origin]
 
   configure :production do
     #  Sinatra::Xsendfile.replace_send_file! #replaces sinatra's send_file with x_send_file
 #    set :xsf_header, 'X-Accel-Redirect' #setting default(X-SendFile) header (nginx)
+    file = File.new("#{settings.root}/tmp/log/#{settings.environment}.log", 'a+')
+    file.sync = true
+    use Rack::CommonLogger, file
   end
 end
 
@@ -625,6 +633,7 @@ class MyApp < Sinatra::Application
       Dir.mktmpdir do |dir|
         seri = 0
         rets.each do |music|
+          request.logger.info music.path
           # musicのpathに実際の格納場所がセットされている。
           filename = "p#{seri}_#{File.basename(music.path)}"
           seri = seri + 1
@@ -636,7 +645,7 @@ class MyApp < Sinatra::Application
      send_file path ,:filename => 'musicdb_pack.tar.gz'
      FileUtils.rm(path)
     rescue => ex
-      ex.to_s
+      request.logger.fatal ex.to_s
     end
   end
 
@@ -656,6 +665,7 @@ class MyApp < Sinatra::Application
       Dir.mktmpdir do |dir|
         seri = 0
         rets.each do |music|
+          request.logger.info music.path
           # musicのpathに実際の格納場所がセットされている。
           filename = "p#{seri}_#{File.basename(music.path)}"
           seri = seri + 1
@@ -667,7 +677,7 @@ class MyApp < Sinatra::Application
      send_file path ,:filename => 'musicdb_pack.tar'
      FileUtils.rm(path)
     rescue => ex
-      ex.to_s
+      request.logger.fatal ex.to_s
     end
   end
 
