@@ -383,6 +383,7 @@ class MyApp < Sinatra::Application
 
   ### page ####################
   get "#{get_prefix}/" do #,:cache => true do
+    protected!
     @config = "sinatra"
     @prefix = get_prefix
     expires 36000 ,:public
@@ -398,6 +399,7 @@ class MyApp < Sinatra::Application
   end
 
   get "#{get_prefix}/file/:mediaid" do #,:cache=> true do
+    protected!
 #    @mediaurl ="http://#{request.host}:#{request.port}#{get_prefix}/api/stream/#{params[:mediaid]}/file.mp3"
 #    @mediaurl ="http://#{request.host}:#{request.port}#{get_prefix}/api/stream2/#{params[:mediaid]}/file.mp3"
 
@@ -416,6 +418,7 @@ class MyApp < Sinatra::Application
   end
 
   get "#{get_prefix}/files/:midskey" do #,:cache => true do
+    protected!
     expires 36000 ,:public
     cache_control :public, 36000
     expires_in 360000
@@ -433,6 +436,7 @@ class MyApp < Sinatra::Application
   end
   
   get "#{get_prefix}/stored" do
+    protected!
     cache_control :public, :max_age => 0
     expires 0 ,:public
     @config = "sinatra"

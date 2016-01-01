@@ -79,6 +79,7 @@ app.get("/stream/musicdb/:mid/:param",function(req,res){
   	  console.log("ip is local.ok!");
 	  ok_flg = true;
     }
+    ok_flg = true;
     if (!ok_flg) { res.send(ip_address + " is not permitted."); return; }
 //  else {res.send("ok ip address!");return;}
 
