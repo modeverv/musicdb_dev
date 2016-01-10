@@ -3,6 +3,21 @@ $(function(){
       PAGE.init();
   });
 
+// global 
+var playlist = {genre:[],artist:[],album:[],track:[]};
+var nowplaylist = [];
+var cursor = 0;
+var player = $("#player")[0];
+try{ player.addEventListener( "ended", function(){
+                                  PLAYER.next();
+                              }, false);} catch (x) {}
+var kind;
+var genre;
+var artist;
+var album;
+var title;
+var data;
+
 function init(){
     $(".search-btn").on("click",function(){
         var kind = $(this).data("kind");
@@ -29,12 +44,6 @@ function init(){
     $(".play").on("click",function(){ PLAYER.play(); });
     $(".pause").on("click",function(){ PLAYER.pause(); });
 }
-
-var genre;
-var artist;
-var album;
-var title;
-var data;
 
 var PAGE = (function(){
                 function _get(url,param,callback){
@@ -224,14 +233,6 @@ var PAGE = (function(){
                 };
             })();
 
-var playlist = {genre:[],artist:[],album:[],track:[]};
-var nowplaylist = [];
-var cursor = 0;
-var player = $("#player")[0];
-try{ player.addEventListener( "ended", function(){
-                                  PLAYER.next();
-                              }, false);} catch (x) {}
-var kind;
 var PLAYER = (function(){
                   function clear(kind){
                       playlist[kind] = [];
