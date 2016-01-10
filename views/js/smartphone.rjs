@@ -51,6 +51,11 @@ var PAGE = (function(){
                                $.mobile.navigate("#" + kind);
                          });
                 }
+                function okext(data){
+                    return data.ext != "ape" && data.ext != "flac" && 
+                         data.ext && "mka" && data.ext && "tta" && 
+                         data.ext != "tak" ;
+                }
                 // init 
                 function pageInit(){
                     function replacer(template,data){
@@ -74,8 +79,10 @@ var PAGE = (function(){
                         var kind = "artist";
                         PLAYER.clear(kind);
                         for(var i=0,l=data.length;i<l;i++){
-                            PLAYER.add(kind,data[i]);
-                            hash[data[i].artist] += 1;
+                            if(okext(data[i])){
+                                PLAYER.add(kind,data[i]);
+                                hash[data[i].artist] += 1;
+                            }
                         }
                         for(var artist in hash){
                             artists.push(artist);
@@ -108,9 +115,11 @@ var PAGE = (function(){
                         var kind = "album";
                         PLAYER.clear(kind);
                         for(var i=0,l=data.length;i<l;i++){
-                            if(data[i].genre == genre && data[i].artist == artist){
-                              PLAYER.add(kind,data[i]);
-                              hash[data[i].album] += 1;
+                            if(okext(data[i])){
+                                if(data[i].genre == genre && data[i].artist == artist){
+                                    PLAYER.add(kind,data[i]);
+                                    hash[data[i].album] += 1;
+                                }
                             }
                         }
                         for(var album in hash){
@@ -137,9 +146,11 @@ var PAGE = (function(){
                         var kind = "track";
                         PLAYER.clear(kind);
                         for(var i=0,l=data.length;i<l;i++){
-                            if(data[i].genre == genre && data[i].artist == artist && data[i].album == album){
-                              PLAYER.add(kind,data[i]);
-                              hash[data[i]._id] = {title:data[i].title,value:data[i]._id};
+                            if(okext(data[i])){
+                                if(data[i].genre == genre && data[i].artist == artist && data[i].album == album){
+                                    PLAYER.add(kind,data[i]);
+                                    hash[data[i]._id] = {title:data[i].title,value:data[i]._id};
+                                }
                             }
                         }
                         for(var id in hash){
@@ -168,7 +179,9 @@ var PAGE = (function(){
                         var kind = "track";
                         PLAYER.clear(kind);
                         for(var i=0,l=json[1].length;i<l;i++){
-                            PLAYER.add(kind,json[1][i]);
+                            if(okext(data[i])){
+                                PLAYER.add(kind,json[1][i]);
+                            }
                         }
                         _template(kind,replacer,json[1]);
                     }
