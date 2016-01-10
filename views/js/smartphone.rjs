@@ -53,7 +53,7 @@ var PAGE = (function(){
                 }
                 function okext(data){
                     return data.ext != "ape" && data.ext != "flac" && 
-                         data.ext && "mka" && data.ext && "tta" && 
+                         data.ext != "mka" && data.ext != "tta" && 
                          data.ext != "tak" ;
                 }
                 // init 
@@ -179,7 +179,7 @@ var PAGE = (function(){
                         var kind = "track";
                         PLAYER.clear(kind);
                         for(var i=0,l=json[1].length;i<l;i++){
-                            if(okext(data[i])){
+                            if(okext(json[1][i])){
                                 PLAYER.add(kind,json[1][i]);
                             }
                         }
@@ -231,6 +231,10 @@ var PLAYER = (function(){
                       }
                   }
                   function play(){
+                      try{ player.stop(); } catch (x) { }
+                      try{ player.src = ""; } catch (x) { }
+                      $(".nowplaying").html("not playing yet");
+                      
                       var data = nowplaylist[cursor];
                       //console.log(data);
                       if(data.ext == "ape" ||
