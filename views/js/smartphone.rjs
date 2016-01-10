@@ -9,13 +9,20 @@ function init(){
         var qs = $("#search-text-" + kind).val();
         PAGE.search(kind,qs);
     });
-
     $("ul").on("click","a.pageli",function(){
                    PAGE[$(this).data("type")]($(this).data("value"));
                });
     $("ul").on("click","a.play",function(){
                    PLAYER[$(this).data("type")]($(this).data("value"));
                });
+    /*
+    $( document ).on( "swipeleft", ".ui-page", function( event ) {
+        history.forward();
+    });
+    $( document ).on( "swiperight", ".ui-page", function( event ) {
+        history.back();
+    });
+    */
     $(".back").on("click",function(){ history.back();});
     $(".prev").on("click",function(){ PLAYER.prev(); });
     $(".next").on("click",function(){ PLAYER.next(); });
@@ -26,10 +33,12 @@ function init(){
 var genre;
 var artist;
 var album;
+var title;
 var data;
 
 var PAGE = (function(){
                 function _get(url,param,callback){
+                    $.mobile.loading('show', {theme:"a", text:"Please wait...", textVisible: true}); // This will show AJAX spinner
                     $.ajax({
                                type:"GET",
                                url :url,
@@ -46,10 +55,22 @@ var PAGE = (function(){
                         var h = replacer(t,json[i]);
                         htmls.push(h);
                     }
-                    return $("#content-ul-" + kind).html(htmls.join(""))
+                    /*
+                     $("#content-ul-" + kind).html(htmls.join(""))
                         .promise().done(function(){
+                               $("#content-ul-" + kind).listview();
+                               $("#content-ul-" + kind).listview('refresh');
                                $.mobile.navigate("#" + kind);
                          });
+                     */
+                     $("#content-ul-" + kind).html(htmls.join(""));
+                     $("#content-ul-" + kind).listview();
+                     $("#content-ul-" + kind).listview('refresh');
+                     //$.mobile.navigate("#" + kind);
+                     $('body').pagecontainer('change', "#" + kind,
+                                               { transition: 'flow' } );
+                     $.mobile.loading('hide');
+
                 }
                 function okext(data){
                     return data.ext != "ape" && data.ext != "flac" && 
@@ -253,6 +274,15 @@ var PLAYER = (function(){
                       } catch (x) {
                       }
                       $(".nowplaying").html([data.genre,data.artist,data.album,data.title,data.ext].join(" - "));
+                      genre = data.genre;
+                      artist = data.artist;
+                      album = data.album;
+                      title = data.title;
+                      var text = title + " by " + artist + " - " + album + " #NowPlaying";
+                      var button = '<a href="https://twitter.com/share" class="twitter-share-button" data-url=\" \" data-text="' + text +'" data-via="" data-lang="ja" data-related="" data-hashtags="">ツイート</a>';
+                      $(".share").html("");
+                      $(".share").html(button);
+                      twttr.widgets.load();
                       return "ok";
                   }
                   
