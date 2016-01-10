@@ -17,7 +17,7 @@ class GlobServerFiles
                                    "/var/smb/sdb1/music/iTunes2016",
 #                                   "/var/smb/sdb1/music/iTunesMac",
 #                                   "/var/smb/sdb1/music/iTunesLossless",
-                                   "/var/smb/sdb1/music/iTunesMusicMBP",
+#                                   "/var/smb/sdb1/music/iTunesMusicMBP",
                                   ]
     @ext = args[:ext] ||= [
                            'MP3',

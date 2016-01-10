@@ -383,6 +383,11 @@ class MyApp < Sinatra::Application
 
   ### page ####################
   get "#{get_prefix}/" do #,:cache => true do
+    ua = request.user_agent
+    if ["Android","iPhone"].find{|s| ua.include?(s)}
+      redirect to( "#{get_prefix}/smartphone")
+    end
+
     protected!
     @config = "sinatra"
     @prefix = get_prefix
@@ -464,6 +469,13 @@ class MyApp < Sinatra::Application
     erb :welcome
   end
 
+  get "#{get_prefix}/smartphone" do
+    protected!
+    @config = "sinatra"
+    @prefix = get_prefix
+    erb :smartphone
+  end
+  
   ##########  manage  ###########################################
   get "#{get_prefix}/manage" do
     protected!
@@ -580,6 +592,56 @@ class MyApp < Sinatra::Application
     erb :'css/prettyPhoto' 
   end
 
+  get "#{get_prefix}/css/jquery.mobile.css" do
+    @prefix = get_prefix
+    expires 0 ,:public
+    cache_control :public, 0
+
+    content_type 'text/css'  
+    erb :'css/jquery.mobile' 
+  end
+
+  get "#{get_prefix}/css/smartphone.css" do
+    @prefix = get_prefix
+    expires 0 ,:public
+    cache_control :public, 0
+
+    content_type 'text/css'  
+    erb :'css/smartphone' 
+  end
+  
+  get "#{get_prefix}/js/jquery.js" do
+    @prefix = get_prefix
+    expires 0 ,:public
+    cache_control :public, 0
+    expires_in 0
+    content_type  'application/javascript'
+    erb :'js/jquery'
+  end
+
+  get "#{get_prefix}/js/jquery.mobile.js" do
+    @prefix = get_prefix
+    expires 0 ,:public
+    cache_control :public, 0
+    expires_in 0
+    content_type  'application/javascript'
+    erb :'js/jquery.mobile'
+  end
+
+  get "#{get_prefix}/js/smartphone.js" do
+    @prefix = get_prefix
+    expires 0 ,:public
+    cache_control :public, 0
+    expires_in 0
+    content_type  'application/javascript'
+    erb :'js/smartphone'
+  end
+
+  get "#{get_prefix}/css/images/:path" do 
+    filepath = File.dirname(__FILE__) + "/views/css/images/" + params[:path]
+    send_file filepath 
+  end
+
   ### API #####################
   get "#{get_prefix}/api/search" do
     cache_control :public, :max_age => 1
@@ -606,8 +668,10 @@ class MyApp < Sinatra::Application
   end
 
   get "#{get_prefix}/api/search_by_genre" do
-    cache_control :public, :max_age => 60* 60 * 12
-    expires 60* 60 * 12 ,:public    
+    #cache_control :public, :max_age => 60* 60 * 12
+    cache_control :public, :max_age => 0
+    #expires 60* 60 * 12 ,:public    
+    expires 0  ,:public    
     page = params[:p] ||= 1
     page = page.to_i
     per  = params[:per] ||= 10
@@ -742,7 +806,7 @@ class MyApp < Sinatra::Application
   end
 
   get "#{get_prefix}/api/stream/:mid/*" do
-    ok_ip?
+    # ok_ip?
    
     music = Musicmodel.find(params[:mid])
     cache_control :public, :max_age => 60* 60 * 12

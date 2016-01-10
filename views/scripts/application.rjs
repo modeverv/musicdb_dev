@@ -1,4 +1,3 @@
-//aaa
 /* JS for musicdb */
 var AppUtil = {
     isMsIE : /*@cc_on!@*/false,

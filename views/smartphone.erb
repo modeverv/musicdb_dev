@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>    
+	<title>musicdb_dev::smartphone</title>
+    <link rel="icon" href="//ja.gravatar.com/userimage/14611836/d5caef2a5366cf647fc8fba3430e5854.png" type="image/png">
+	<link rel="stylesheet" href="<%= @prefix %>/css/jquery.mobile.css">
+	<link rel="stylesheet" href="<%= @prefix %>/css/smartphone.css">
+    
+    <script id="template-li-genre" type="text/template">
+      <li>
+        <a class="pageli" href="#" data-type="genre" data-value="%value%" data-rel="page" data-transition="turn">  
+          <h2>%genre%</h2>
+        </a>
+        <!--<a class="play" href="#" data-type="genre" data-value="%value%" data-rel="page">Play</a>-->
+      </li>
+    </script>
+    
+    <script id="template-li-artist" type="text/template">
+      <li>
+        <a class="pageli" href="#" data-type="artist" data-value="%value%" data-rel="page" data-transition="turn">
+          <h2>%value%</h2>
+          <p>genre:%genre%</p>
+        </a>
+        <a class="play" href="#" data-type="artist" data-value="%value%" data-rel="page">Play</a>
+      </li>
+    </script>  
+
+    <script id="template-li-album" type="text/template">
+      <li>
+        <a class="pageli" href="#" data-type="album" data-value="%value%" data-rel="page" data-transition="turn">
+          <h2>%value%</h2>
+          <p class="marquee">artist:%artist%&nbsp;/&nbsp;genre:%genre%</p>
+        </a>
+        <a class="play" href="#" data-type="album" data-value="%value%" data-rel="page">Play</a>
+      </li>
+    </script>
+    
+    <!-- track と searchは同一視する-->
+    <script id="template-li-track" type="text/template">
+      <li>
+        <a class="pageli" href="#" data-type="track" data-value="%value%" data-rel="page" data-transition="turn">
+          <h2>%title%</h2>
+          <p class="marquee">artist:%artist%&nbsp;/&nbsp;album:%album%&nbsp;/&nbsp;genre:%genre%</p>
+        </a>
+        <a class="play" href="#" data-type="track" data-value="%value%" data-rel="page">Play</a>
+      </li>
+    </script>
+    
+</head>
+
+<body>
+<div id="playerarea">
+  <audio controls id="player" class="player"></audio>
+</div>
+
+<div data-role="page" id="index" data-theme="b">
+  <h1 style="text-align:center">musicdb_dev::smartphone</h1>
+</div>  
+
+<% ["genre","artist","album","track"].each do |kind| %>
+<div data-role="page" id="<%= kind %>" data-theme="b">
+  <header id="header" data-id="common_header" data-role="header"
+   data-position="fixed">
+    <h1>musicdb_dev</span></h1>
+    <div class="ui-grid-a">
+        <div class="ui-block-a" style="width:75%;">  
+          <input id="search-text-<%= kind %>" class="text" type="text" placeholder="input search text..." data-type="search"/>
+        </div>
+        <div class="ui-block-b" style="width:25%;margin-top:3px">
+          <button class="search-btn" data-kind="<%= kind %>" id="seach-btn-<%= kind %>">SEARCH</button>
+        </div>
+    </div>
+    <div class="marquee">
+     <p class="nowplaying">not playing yet</p>
+    </div>
+    <div class="control">
+      <button class="back">back</button>
+      <button class="play">play</button>
+      <button class="pause">||</button>
+      <button class="prev"><<</button>
+      <button class="next">>></button>
+    </div>
+  </header>
+  <ul id="content-ul-<%= kind %>" data-role="listview" data-autodividers="true" data-filter="true" data-split-theme="a" data-inset="true">
+  <ul>
+</div>
+<% end %>
+	<script src="<%= @prefix %>/js/jquery.js"></script>
+   	<script src="<%= @prefix %>/js/jquery.mobile.js"></script>
+	<script src="<%= @prefix %>/js/smartphone.js"></script>
+</body>
+</html>

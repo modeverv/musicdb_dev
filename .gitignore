@@ -6,5 +6,6 @@ tmp/sockets/*
 tmp/musicdb_dev/*
 *.log
 *_flymake*
-
+.DS_Store
+._.DS_Store
 

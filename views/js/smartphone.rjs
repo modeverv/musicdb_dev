@@ -1,0 +1,308 @@
+$(function(){
+      init();
+      PAGE.init();
+  });
+
+function init(){
+    $(".search-btn").on("click",function(){
+        var kind = $(this).data("kind");
+        var qs = $("#search-text-" + kind).val();
+        PAGE.search(kind,qs);
+    });
+
+    $("ul").on("click","a.pageli",function(){
+                   PAGE[$(this).data("type")]($(this).data("value"));
+               });
+    $("ul").on("click","a.play",function(){
+                   PLAYER[$(this).data("type")]($(this).data("value"));
+               });
+    $(".back").on("click",function(){ history.back();});
+    $(".prev").on("click",function(){ PLAYER.prev(); });
+    $(".next").on("click",function(){ PLAYER.next(); });
+    $(".play").on("click",function(){ PLAYER.play(); });
+    $(".pause").on("click",function(){ PLAYER.pause(); });
+}
+
+var genre;
+var artist;
+var album;
+var data;
+
+var PAGE = (function(){
+                function _get(url,param,callback){
+                    $.ajax({
+                               type:"GET",
+                               url :url,
+                               data:param,
+                               dataType:"json"
+                           }).done(function(json){
+                                       callback(json);
+                           });
+                }
+                function _template(kind,replacer,json){
+                    var t = $("#template-li-" + kind).text();
+                    var htmls = [];
+                    for(var i=0,l=json.length;i<l;i++){
+                        var h = replacer(t,json[i]);
+                        htmls.push(h);
+                    }
+                    return $("#content-ul-" + kind).html(htmls.join(""))
+                        .promise().done(function(){
+                               $.mobile.navigate("#" + kind);
+                         });
+                }
+                // init 
+                function pageInit(){
+                    function replacer(template,data){
+                        return template.replace(/%value%/g,data.name)
+                            .replace(/%genre%/g,data.name2);
+                    }
+                    function cb(json){
+                        _template("genre",replacer,json[1]);
+                    }
+                    _get("api/genres",{},cb);
+                }
+                // genre => artist
+                function pageGenre(e){
+                    function replacer(template,data){
+                        return template.replace(/%value%/g,data)
+                            .replace(/%genre%/g,genre);
+                    }
+                    function makeArtists(){
+                        var artists = [];
+                        var hash = {};
+                        var kind = "artist";
+                        PLAYER.clear(kind);
+                        for(var i=0,l=data.length;i<l;i++){
+                            PLAYER.add(kind,data[i]);
+                            hash[data[i].artist] += 1;
+                        }
+                        for(var artist in hash){
+                            artists.push(artist);
+                        }
+                        return artists;
+                    }
+                    function cb(json){
+                        data = json[1];
+                        var artists = makeArtists();
+                        _template("artist",replacer,artists);
+                    }
+                    var params = {
+                      p  : 1,
+                      per: 10000000000,
+                      qs : e
+                    };
+                    genre = e;
+                    _get("api/search_by_genre",params,cb);
+                }
+                // artist => album
+                function pageArtist(e){
+                    function replacer(template,data){
+                        return template.replace(/%value%/g,data)
+                            .replace(/%genre%/g,genre)
+                            .replace(/%artist%/g,artist);
+                    }
+                    function makeAlbums(){
+                        var albums = [];
+                        var hash = {};
+                        var kind = "album";
+                        PLAYER.clear(kind);
+                        for(var i=0,l=data.length;i<l;i++){
+                            if(data[i].genre == genre && data[i].artist == artist){
+                              PLAYER.add(kind,data[i]);
+                              hash[data[i].album] += 1;
+                            }
+                        }
+                        for(var album in hash){
+                            albums.push(album);
+                        }
+                        return albums;
+                    }
+                    artist = e;
+                    var albums = makeAlbums();
+                    _template("album",replacer,albums);
+                }
+                // album => track
+                function pageAlbum(e){
+                    function replacer(template,data){
+                        return template.replace(/%value%/g,data.value)
+                            .replace(/%genre%/g,genre)
+                            .replace(/%artist%/g,artist)
+                            .replace(/%album%/g,album)
+                            .replace(/%title%/g,data.title);
+                    }
+                    function makeTracks(){
+                        var tracks = [];
+                        var hash = {};
+                        var kind = "track";
+                        PLAYER.clear(kind);
+                        for(var i=0,l=data.length;i<l;i++){
+                            if(data[i].genre == genre && data[i].artist == artist && data[i].album == album){
+                              PLAYER.add(kind,data[i]);
+                              hash[data[i]._id] = {title:data[i].title,value:data[i]._id};
+                            }
+                        }
+                        for(var id in hash){
+                            tracks.push(hash[id]);
+                        }
+                        return tracks;
+                    }
+                    album = e;
+                    var tracks = makeTracks();
+                    _template("track",replacer,tracks);
+                }
+                // track => play track
+                function pageTrack(e){
+                    PLAYER["track"](e);
+                }
+                // search
+                function pageSearch(kind,qs){
+                    function replacer(template,data){
+                        return template.replace(/%value%/g,data._id)
+                            .replace(/%genre%/g,data.genre)
+                            .replace(/%artist%/g,data.artist)
+                            .replace(/%album%/g,data.album)
+                            .replace(/%title%/g,data.title);
+                    }
+                    function cb(json){
+                        var kind = "track";
+                        PLAYER.clear(kind);
+                        for(var i=0,l=json[1].length;i<l;i++){
+                            PLAYER.add(kind,json[1][i]);
+                        }
+                        _template(kind,replacer,json[1]);
+                    }
+                    var params = {
+                        p  : 1,
+                        per: 100000000,
+                        qs : qs
+                    };
+                    _get("api/search",params,cb);
+                }
+                
+                return {
+                    init  : pageInit,
+                    genre : pageGenre,
+                    artist: pageArtist,
+                    album : pageAlbum,
+                    track : pageTrack,
+                    search: pageSearch
+                };
+            })();
+
+var playlist = {genre:[],artist:[],album:[],track:[]};
+var nowplaylist = [];
+var cursor = 0;
+var player = $("#player")[0];
+try{ player.addEventListener( "ended", function(){
+                                  PLAYER.next();
+                              }, false);} catch (x) {}
+var kind;
+var PLAYER = (function(){
+                  function clear(kind){
+                      playlist[kind] = [];
+                  }
+                  function add(kind,e){
+                      playlist[kind].push(e);
+                  }
+                  function _nextCursor(){
+                      cursor++;
+                      if(cursor == nowplaylist.length){
+                          cursor = 0;
+                      }
+                  }
+                  function _prevCursor(){
+                      cursor--;
+                      if(cursor <= 0){
+                          cursor = nowplaylist.length -1;
+                      }
+                  }
+                  function play(){
+                      var data = nowplaylist[cursor];
+                      //console.log(data);
+                      if(data.ext == "ape" ||
+                         data.ext == "flac" ||
+                         data.ext == "mka" ||
+                         data.ext == "tta" ||
+                         data.ext == "tak" 
+                        ){
+                            //console.log("can't play " + mid.ext + " try next.");
+                            return  next();
+                        }
+                      var url = "api/stream/" + data._id + "/file." + data.ext;
+                      try{
+                          player.src = url;
+                          player.play();      
+                      } catch (x) {
+                      }
+                      $(".nowplaying").html([data.genre,data.artist,data.album,data.title,data.ext].join(" - "));
+                      return "ok";
+                  }
+                  
+                  function next(){
+                      _nextCursor();
+                      play();
+                  }
+                  function prev(){
+                      _prevCursor();
+                      play();
+                  }
+                  function pause(){
+                      if(player.paused){
+                          player.play();
+                      }else{
+                          player.pause();
+                      }
+                  }
+                  function playGenre(e){
+                      // not function
+                  }
+                  function playArtist(e){
+                      kind = "artist";
+                      nowplaylist = [];
+                      for(var i=0,l=playlist[kind].length;i<l;i++){
+                          if(playlist[kind][i].artist == e){
+                              nowplaylist.push(playlist[kind][i]);
+                          }
+                      }
+                      play();
+                  }
+                  function playAlbum(e){
+                      kind = "album";
+                      nowplaylist = [];
+                      for(var i=0,l=playlist[kind].length;i<l;i++){
+                          if(playlist[kind][i].album == e){
+                              nowplaylist.push(playlist[kind][i]);
+                          }
+                      }
+                      play();
+                  }
+                  function playTrack(e){
+                      kind = "track";
+                      nowplaylist = [];
+                      for(var i=0,l=playlist[kind].length;i<l;i++){
+                          if(playlist[kind][i]._id == e){
+                              nowplaylist.push(playlist[kind][i]);
+                          }
+                      }
+                      for(var i=0,l=playlist[kind].length;i<l;i++){
+                          if(playlist[kind][i]._id != e){
+                              nowplaylist.push(playlist[kind][i]);
+                          }
+                      }
+                      play();
+                  }
+                  return {
+                      clear : clear,
+                      add   : add,
+                      play  : play,
+                      next  : next,
+                      prev  : prev,
+                      pause : pause,
+                      genre : playGenre,
+                      artist: playArtist,
+                      album : playAlbum,
+                      track : playTrack    
+                  };
+              })();
+
