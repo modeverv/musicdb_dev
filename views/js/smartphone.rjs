@@ -38,6 +38,7 @@ function init(){
         history.back();
     });
     */
+    $(".init").on("click",function(){ location.href = "/musicdb_dev/smartphone"; });
     $(".back").on("click",function(){ history.back();});
     $(".prev").on("click",function(){ PLAYER.prev(); });
     $(".next").on("click",function(){ PLAYER.next(); });
