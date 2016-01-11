@@ -345,6 +345,7 @@ var PLAYER = (function(){
                           }
                       }
                       makePlaylist();
+                      cursor = 0;
                       play();
                   }
                   function playAlbum(e){
@@ -356,6 +357,7 @@ var PLAYER = (function(){
                           }
                       }
                       makePlaylist();
+                      cursor = 0;
                       play();
                   }
                   function playTrack(e){
@@ -378,6 +380,7 @@ var PLAYER = (function(){
                           nowplaylist.push(playlist[kind][i]);
                       }
                       makePlaylist();
+                      cursor = 0;
                       play();
                   }
                   function makePlaylist(cur){
