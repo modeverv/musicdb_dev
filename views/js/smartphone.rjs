@@ -282,6 +282,7 @@ var PLAYER = (function(){
                       try{
                           player.src = url;
                           player.play();      
+                          $(".pause").html("||");
                       } catch (x) {
                       }
                       $(".nowplaying").html([data.genre,data.artist,data.album,data.title,data.ext,""].join(" - "));

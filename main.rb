@@ -686,8 +686,8 @@ class MyApp < Sinatra::Application
   end
 
   post "#{get_prefix}/api/gzip" do
-    ok_ip?
-
+    protected!
+    
     begin
       require "tmpdir"
       ids = params[:qs].split(' ')
@@ -718,7 +718,7 @@ class MyApp < Sinatra::Application
   end
 
   post "#{get_prefix}/api/tar" do
-    ok_ip?
+    protected!
 
     begin
       require "tmpdir"
@@ -750,7 +750,6 @@ class MyApp < Sinatra::Application
   end
 
   post "#{get_prefix}/api/m3u" do
-    ok_ip?
 
     begin
       require 'digest'
