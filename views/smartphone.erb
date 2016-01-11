@@ -84,7 +84,7 @@
   <header id="header" data-id="common_header" data-role="header"
    data-position="fixed">
     <div class="marquee">
-      <p><span class="nowplaying"></span>&nbsp;-&nbsp;musicdb_dev::<%= kind %></p>
+      <p><span class="nowplaying"></span>musicdb_dev::<%= kind %></p>
     </div>
     <div class="ui-grid-a">
         <div class="ui-block-a" style="width:75%;">  
@@ -94,7 +94,7 @@
           <button class="search-btn" data-kind="<%= kind %>" id="seach-btn-<%= kind %>">SEARCH</button>
         </div>
     </div>
-    <div class="control">
+    <div id="control-<%= kind %>">
       <button class="pause">||</button>
       <button class="prev"><<</button>
       <button class="next">>></button>
@@ -123,7 +123,7 @@
 	<script src="<%= @prefix %>/js/jquery.js"></script>
    	<script src="<%= @prefix %>/js/jquery.mobile.js"></script>
 	<script src="<%= @prefix %>/js/smartphone.js"></script>
-    <!--<script id="twitter-wjs" src="http://platform.twitter.com/widgets.js"></script>-->
+    <script id="twitter-wjs" src="//platform.twitter.com/widgets.js"></script>
 </head>
 </body>
 </html>

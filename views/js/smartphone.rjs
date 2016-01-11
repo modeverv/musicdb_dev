@@ -284,16 +284,16 @@ var PLAYER = (function(){
                           player.play();      
                       } catch (x) {
                       }
-                      $(".nowplaying").html([data.genre,data.artist,data.album,data.title,data.ext].join(" - "));
+                      $(".nowplaying").html([data.genre,data.artist,data.album,data.title,data.ext,""].join(" - "));
                       genre = data.genre;
                       artist = data.artist;
                       album = data.album;
                       title = data.title;
-                      //var text = title + " by " + artist + " - " + album + " #NowPlaying";
-                      //var button = '<a href="https://twitter.com/share" class="twitter-share-button" data-url=\" \" data-text="' + text +'" data-via="" data-lang="ja" data-related="" data-hashtags="">ツイート</a>';
-                      //$(".share").html("");
-                      //$(".share").html(button);
-                      //twttr.widgets.load();
+                      var text = title + " by " + artist + " - " + album + " #NowPlaying";
+                      var button = '<a href="https://twitter.com/share" class="twitter-share-button" data-url=\" \" data-text="' + text +'" data-via="" data-lang="ja" data-related="" data-hashtags="">ツイート</a>';
+                      $(".share").html("");
+                      $(".share").html(button);
+                      twttr.widgets.load(document.getElementsByClassName('share'));
                       return "ok";
                   }
                   function next(){
