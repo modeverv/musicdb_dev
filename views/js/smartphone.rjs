@@ -11,6 +11,7 @@ var player = $("#player")[0];
 try{ player.addEventListener( "ended", function(){
                                   PLAYER.next();
                               }, false);} catch (x) {}
+
 var kind;
 var genre;
 var artist;
@@ -52,6 +53,24 @@ function init(){
                         $('body').pagecontainer('change', "#playlist-popup",
                                                 { transition: 'turn' } );
                       });
+    player.addEventListener("timeupdate",function(){
+                                var NOW = Math.floor(player.currentTime);
+                                var TOTAL = Math.round(player.duration);
+                                var VALUE = Math.round(NOW / TOTAL * 100);
+                                $(".ui-slider-bg").attr("style","width:" + VALUE + "%");
+                                $(".ui-slider-handle").attr("aria-valuenow",VALUE)
+                                    .attr("aria-valuenow",VALUE).attr("aria-valuetext",VALUE)
+                                    .attr("title",VALUE).attr("style","left:" + VALUE +"%");
+                                $("#slider-" + kind).attr("value",VALUE);
+                            });
+    $(".slider-div").on("mouseup touchend","a",function () {
+                            var currentTime = $("#slider-" + kind).val() / (100 / player.duration);
+                            player.currentTime = currentTime;
+                        });
+
+    $("slider-div").on("mousedown touchstart","a", function () {
+                           player.pause();
+                       });
 }
 
 var PAGE = (function(){

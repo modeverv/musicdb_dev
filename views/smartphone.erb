@@ -103,6 +103,14 @@
       <button class="playlist" style="display:none;">playlist</button>
       <span class="share"></span>
     </div>
+
+    <div>
+    <form>
+      <div class="slider-div">
+        <input class="slider" name="slider" id="slider-<%= kind %>" data-highlight="true" min="0" max="100" value="0" type="range">
+      </div>
+    </form>
+    </div>
   </header>
   <ul id="content-ul-<%= kind %>" data-role="listview" data-autodividers="true" data-filter="true" data-split-theme="a" data-inset="true">
   <ul>

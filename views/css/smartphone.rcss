@@ -2,3 +2,6 @@
   overflow:-webkit-marquee;
   white-space:nowrap;
 }
+#slider { display:none; }
+.ui-slider-track { margin-left: 15px; }
+
