@@ -30,6 +30,10 @@ function init(){
     $("ul").on("click","a.play",function(){
                    PLAYER[$(this).data("type")]($(this).data("value"));
                });
+    $("ul").on("click","a.pagecur",function(){
+                   PLAYER[$(this).data("type")]($(this).data("cursor"));
+                   history.back();
+               });
     /*
     $( document ).on( "swipeleft", ".ui-page", function( event ) {
         history.forward();
@@ -44,6 +48,10 @@ function init(){
     $(".next").on("click",function(){ PLAYER.next(); });
     $(".play").on("click",function(){ PLAYER.play(); });
     $(".pause").on("click",function(){ PLAYER.pause(); });
+    $(".playlist").on("click",function(){ 
+                        $('body').pagecontainer('change', "#playlist-popup",
+                                                { transition: 'turn' } );
+                      });
 }
 
 var PAGE = (function(){
@@ -58,29 +66,22 @@ var PAGE = (function(){
                                        callback(json);
                            });
                 }
-                function _template(kind,replacer,json){
+                function _template(kind,replacer,json,donavigation){
                     var t = $("#template-li-" + kind).text();
                     var htmls = [];
                     for(var i=0,l=json.length;i<l;i++){
-                        var h = replacer(t,json[i]);
+                        var h = replacer(t,json[i],i);
                         htmls.push(h);
                     }
-                    /*
-                     $("#content-ul-" + kind).html(htmls.join(""))
-                        .promise().done(function(){
-                               $("#content-ul-" + kind).listview();
-                               $("#content-ul-" + kind).listview('refresh');
-                               $.mobile.navigate("#" + kind);
-                         });
-                     */
-                     $("#content-ul-" + kind).html(htmls.join(""));
-                     $("#content-ul-" + kind).listview();
-                     $("#content-ul-" + kind).listview('refresh');
-                     //$.mobile.navigate("#" + kind);
-                     $('body').pagecontainer('change', "#" + kind,
-                                               { transition: 'flow' } );
-                     $.mobile.loading('hide');
-
+                    $("#content-ul-" + kind).html(htmls.join(""));
+                    $("#content-ul-" + kind).listview();
+                    $("#content-ul-" + kind).listview('refresh');
+                    if(donavigation != false){
+                        //$.mobile.navigate("#" + kind);
+                        $('body').pagecontainer('change', "#" + kind,
+                                                { transition: 'flow' } );
+                    }
+                    $.mobile.loading('hide');
                 }
                 function okext(data){
                     return data.ext != "ape" && data.ext != "flac" && 
@@ -223,14 +224,24 @@ var PAGE = (function(){
                     };
                     _get("api/search",params,cb);
                 }
-                
+                function pagePlaylist(){
+                    function replacer(template,data,i){
+                        return template.replace(/%cursor%/g,i)
+                            .replace(/%genre%/g,data.genre)
+                            .replace(/%artist%/g,data.artist)
+                            .replace(/%album%/g,data.album)
+                            .replace(/%title%/g,data.title);
+                    }
+                    _template("playlist",replacer,nowplaylist,false);
+                }
                 return {
                     init  : pageInit,
                     genre : pageGenre,
                     artist: pageArtist,
                     album : pageAlbum,
                     track : pageTrack,
-                    search: pageSearch
+                    search: pageSearch,
+                    makeplaylist:pagePlaylist
                 };
             })();
 
@@ -257,9 +268,7 @@ var PLAYER = (function(){
                       try{ player.stop(); } catch (x) { }
                       try{ player.src = ""; } catch (x) { }
                       $(".nowplaying").html("not playing yet");
-                      
                       var data = nowplaylist[cursor];
-                      console.log(data);
                       if(data.ext == "ape" ||
                          data.ext == "flac" ||
                          data.ext == "mka" ||
@@ -287,7 +296,6 @@ var PLAYER = (function(){
                       //twttr.widgets.load();
                       return "ok";
                   }
-                  
                   function next(){
                       _nextCursor();
                       play();
@@ -299,8 +307,10 @@ var PLAYER = (function(){
                   function pause(){
                       if(player.paused){
                           player.play();
+                          $(".pause").html("||");
                       }else{
                           player.pause();
+                          $(".pause").html(">");
                       }
                   }
                   function playGenre(e){
@@ -314,6 +324,7 @@ var PLAYER = (function(){
                               nowplaylist.push(playlist[kind][i]);
                           }
                       }
+                      makePlaylist();
                       play();
                   }
                   function playAlbum(e){
@@ -324,21 +335,37 @@ var PLAYER = (function(){
                               nowplaylist.push(playlist[kind][i]);
                           }
                       }
+                      makePlaylist();
                       play();
                   }
                   function playTrack(e){
                       kind = "track";
                       nowplaylist = [];
+                      var pointer = 0;
+                      var pointerset = false;
+                      var found = false;
                       for(var i=0,l=playlist[kind].length;i<l;i++){
-                          if(playlist[kind][i]._id == e){
+                          if(playlist[kind][i]._id == e || found){
+                              if(!pointerset){
+                                  pointer = i;
+                              }
+                              pointerset = true;
+                              found = true;
                               nowplaylist.push(playlist[kind][i]);
                           }
                       }
-                      for(var i=0,l=playlist[kind].length;i<l;i++){
-                          if(playlist[kind][i]._id != e){
-                              nowplaylist.push(playlist[kind][i]);
-                          }
+                      for(var i=0,l=pointer;i<l;i++){
+                          nowplaylist.push(playlist[kind][i]);
                       }
+                      makePlaylist();
+                      play();
+                  }
+                  function makePlaylist(cur){
+                      PAGE.makeplaylist();
+                      $(".playlist").show();
+                  }
+                  function playpoint(cur){
+                      cursor = cur;
                       play();
                   }
                   return {
@@ -351,7 +378,8 @@ var PLAYER = (function(){
                       genre : playGenre,
                       artist: playArtist,
                       album : playAlbum,
-                      track : playTrack    
+                      track : playTrack,
+                      playpoint : playpoint
                   };
               })();
 

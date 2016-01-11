@@ -56,6 +56,20 @@
         <a class="play" href="#" data-type="track" data-value="%value%" data-rel="page">Play</a>
       </li>
     </script>
+
+    <script id="template-li-playlist" type="text/template">
+      <li>
+        <a class="pagecur" href="#" data-type="playpoint" data-cursor="%cursor%" data-rel="page" data-transition="turn">
+          <h2>%title%</h2>
+          <div>
+            <p>artist:%artist%</p>
+            <p>album:%album%</p>
+            <p>genre:%genre%</p>
+          </div>
+        </a>
+      </li>
+    </script>
+
 </head>
 
 <body>
@@ -85,6 +99,7 @@
       <button class="prev"><<</button>
       <button class="next">>></button>
       <button class="init">init</button>
+      <button class="playlist" style="display:none;">playlist</button>
       <span class="share"></span>
     </div>
   </header>
@@ -92,6 +107,19 @@
   <ul>
 </div>
 <% end %>
+
+<div data-role="page" class="ui-content" id="playlist-popup" data-theme="b">
+  <header id="header" data-id="common_header" data-role="header"
+   data-position="fixed">
+    <div class="marquee">
+      <p>playlist</p>
+    </div>
+    <a href="#" data-transition="turn" data-theme="b" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>
+  </header>
+  <ul id="content-ul-playlist" data-role="listview" data-filter="true" data-split-theme="a" data-inset="true">-->
+  <ul>
+</div>
+
 	<script src="<%= @prefix %>/js/jquery.js"></script>
    	<script src="<%= @prefix %>/js/jquery.mobile.js"></script>
 	<script src="<%= @prefix %>/js/smartphone.js"></script>
