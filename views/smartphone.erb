@@ -70,11 +70,11 @@
     </script>
 </head>
 <body>
-  
+<!--  
 <div data-role="page" id="index" data-theme="b">
   <h1 style="text-align:center">musicdb_dev::smartphone</h1>
 </div>  
-
+-->
 <% ["genre","artist","album","track"].each do |kind| %>
 <div data-role="page" class="ui-page" id="<%= kind %>" data-theme="b">
   <header id="header" data-id="common_header" data-role="header"
@@ -83,12 +83,14 @@
       <p><span class="nowplaying"></span>musicdb_dev::<%= kind %></p>
     </div>
     <div class="ui-grid-a">
+      <form class="search" data-kind="<%= kind %>">
         <div class="ui-block-a block-a">  
           <input id="search-text-<%= kind %>" class="search-text" type="text" placeholder="input search text..." data-type="search"/>
         </div>
         <div class="ui-block-b block-b">
           <button class="search-btn" data-kind="<%= kind %>" id="seach-btn-<%= kind %>">SEARCH</button>
         </div>
+      </form>  
     </div>
     <div id="control-<%= kind %>">
       <!--<button class="back">back</button>-->

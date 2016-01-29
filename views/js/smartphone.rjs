@@ -1,7 +1,6 @@
 $(function(){
       init();
-      PAGE.init();
-  });
+});
 
 // global 
 var playlist = {genre:[],artist:[],album:[],track:[]};
@@ -26,6 +25,11 @@ function init(){
         $(".search-text").val(qs);
         PAGE.search(kind,qs);
     });
+    $("form.search").each(function(){
+                              this.onsubmit = function(){
+                                  return false;
+                              };
+                          });
     $("ul").on("click","a.pageli",function(){
                    PAGE[$(this).data("type")]($(this).data("value"));
                });
@@ -44,7 +48,10 @@ function init(){
         history.back();
     });
     */
-    $(".init").on("click",function(){ location.href = "/musicdb_dev/smartphone"; });
+    $(".init").on("click",function(){ 
+                      PAGE.init();
+                      //location.href = "/musicdb_dev/smartphone"; 
+                  });
     $(".back").on("click",function(){ history.back();});
     $(".prev").on("click",function(){ PLAYER.prev(); });
     $(".next").on("click",function(){ PLAYER.next(); });
@@ -99,9 +106,9 @@ var PAGE = (function(){
                     $("#content-ul-" + kind).listview();
                     $("#content-ul-" + kind).listview('refresh');
                     if(donavigation != false){
-                        //$.mobile.navigate("#" + kind);
-                        $('body').pagecontainer('change', "#" + kind,
-                                                { transition: 'slidefade' } );
+                        //                     $('body').pagecontainer('change', "#" + kind,
+                        //                        { transition: 'slidefade' } );
+                        $.mobile.navigate("#" + kind);
                     }
                     $("#overlay").hide();
                     $.mobile.loading('hide');
@@ -155,7 +162,7 @@ var PAGE = (function(){
                       qs : e
                     };
                     genre = e;
-                    _get("api/search_by_genre",params,cb);
+                    _get("<%= @prefix %>/api/search_by_genre",params,cb);
                 }
                 // artist => album
                 function pageArtist(e){
@@ -245,7 +252,7 @@ var PAGE = (function(){
                         per: 100000000,
                         qs : qs
                     };
-                    _get("api/search",params,cb);
+                    _get("<%= @prefix %>/api/search",params,cb);
                 }
                 function pagePlaylist(){
                     function replacer(template,data,i){
@@ -313,7 +320,7 @@ var PLAYER = (function(){
                       artist = data.artist;
                       album = data.album;
                       title = data.title;
-                      var text = title + " by " + artist + " - " + album + " #NowPlaying #musicdb";
+                      var text = title + " by " + artist + " - " + album + " #NowPlaying";
                       var button = '<a href="https://twitter.com/share" class="twitter-share-button" data-url=\" \" data-text="' + text +'" data-via="" data-lang="ja" data-related="" data-hashtags=""></a>';
                       $(".share").html("");
                       $(".share").html(button);
