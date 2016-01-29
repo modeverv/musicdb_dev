@@ -76,7 +76,7 @@ function init(){
 
 var PAGE = (function(){
                 function _get(url,param,callback){
-		    $("#overlay").toggle();
+                    $("#overlay").show();
                     $.mobile.loading('show', {theme:"a", text:"Please wait...", textVisible: true});
                     $.ajax({
                                type:"GET",
@@ -103,7 +103,7 @@ var PAGE = (function(){
                         $('body').pagecontainer('change', "#" + kind,
                                                 { transition: 'slidefade' } );
                     }
-		    $("#overlay").toggle();
+                    $("#overlay").hide();
                     $.mobile.loading('hide');
                 }
                 function okext(data){
