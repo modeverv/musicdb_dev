@@ -3,5 +3,5 @@ production:
         default:
             hosts:
                 - localhost:27017
-            database: misic-mongoid
+            database: music2-mongoid
 

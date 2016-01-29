@@ -1,7 +1,20 @@
+#control { display:none;}
+
 .marquee {
   overflow:-webkit-marquee;
   white-space:nowrap;
 }
-#slider { display:none; }
+.slider-div input {
+    display: none;
+}
+.slider-div .ui-slider-track {
+    margin-left: 15px;
+}
 .ui-slider-track { margin-left: 15px; }
-
+.block-a { width:75%;}
+.block-b { width:25%;margin-top:3px;padding-left:10px;}
+.playlist {display:none;}
+#playlist-popup {
+  padding-left:0px;
+  padding-right:0px;
+}

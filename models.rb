@@ -32,7 +32,7 @@ begin
   Mongoid.load!( File.dirname(__FILE__) + "/mongoid.yml",:production)
 rescue
   Mongoid.configure do |config|
-    config.master = Mongo::Connection.new('localhost').db('misic-mongoid')
+    config.master = Mongo::Connection.new('localhost').db('music2-mongoid')
     # config.master = Mongo::Connection.new('localhost').db('photo-mongoid2')
     #  config.identity_map_enabled = true
   end
@@ -406,7 +406,9 @@ class Musicmodel
 #                                     "/var/smb/sdb1/music/iTunes2012",
 #                                     "/var/smb/sdb1/music/iTunes2013",
 #                                     "/var/smb/sdb1/music/iTunes2014",
-                                     "/var/smb/sdb1/music/iTunes2015",
+                                     "/var/smb/sdb1/music",
+#                                     "/var/smb/sdb1/music/iTunes2015",
+                                     "/var/smb/sdb1/music/iTunes2016",
 #                                    "/var/smb/sdb1/music"
                                    ]
       ext = args[:ext] ||= [

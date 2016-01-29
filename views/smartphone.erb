@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -69,12 +68,9 @@
         </a>
       </li>
     </script>
-
 </head>
-
 <body>
-<audio controls id="player" class="player" style="display:none;"></audio>
-
+  
 <div data-role="page" id="index" data-theme="b">
   <h1 style="text-align:center">musicdb_dev::smartphone</h1>
 </div>  
@@ -87,10 +83,10 @@
       <p><span class="nowplaying"></span>musicdb_dev::<%= kind %></p>
     </div>
     <div class="ui-grid-a">
-        <div class="ui-block-a" style="width:75%;">  
-          <input id="search-text-<%= kind %>" class="text" type="text" placeholder="input search text..." data-type="search"/>
+        <div class="ui-block-a block-a">  
+          <input id="search-text-<%= kind %>" class="search-text" type="text" placeholder="input search text..." data-type="search"/>
         </div>
-        <div class="ui-block-b" style="width:25%;margin-top:3px;padding-left:10px">
+        <div class="ui-block-b block-b">
           <button class="search-btn" data-kind="<%= kind %>" id="seach-btn-<%= kind %>">SEARCH</button>
         </div>
     </div>
@@ -100,7 +96,7 @@
       <button class="prev"><<</button>
       <button class="next">>></button>
       <button class="init">init</button>
-      <button class="playlist" style="display:none;">playlist</button>
+      <button class="playlist">playlist</button>
       <span class="share"></span>
     </div>
 
@@ -117,10 +113,10 @@
 </div>
 <% end %>
 
-<div style="padding-left:0px;padding-right:0px;"data-role="page" class="ui-content" id="playlist-popup" data-theme="b">
+<div data-role="page" class="ui-content" id="playlist-popup" data-theme="b">
   <header id="header" data-id="common_header" data-role="header"
    data-position="fixed">
-    <a href="#" data-transition="turn" data-theme="b" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>
+    <a href="#" data-transition="slidefade" data-theme="b" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>
     <div>
       <p>playlist</p>
     </div>
@@ -129,10 +125,16 @@
   <ul>
 </div>
 
-	<script src="<%= @prefix %>/js/jquery.js"></script>
-   	<script src="<%= @prefix %>/js/jquery.mobile.js"></script>
-	<script src="<%= @prefix %>/js/smartphone.js"></script>
-    <script id="twitter-wjs" src="//platform.twitter.com/widgets.js"></script>
-</head>
+<div id="control">
+  <audio id="player" class="player"></audio>
+</div>
+
+<div id="overlay" style="position:fixed;top:0;left:0;background-color:#000;opacity:0.7;z-index:1200;height:100%;width:100%;display:none;color:#fff">
+</div>
+
+<script src="<%= @prefix %>/js/jquery.js"></script>
+<script src="<%= @prefix %>/js/jquery.mobile.js"></script>
+<script id="twitter-wjs" src="//platform.twitter.com/widgets.js"></script>
+<script src="<%= @prefix %>/js/smartphone.js"></script>
 </body>
 </html>

@@ -499,12 +499,12 @@ class MyApp < Sinatra::Application
 
   get "#{get_prefix}/api/genres" do
     #  rets = Genremodel.all.only(:id,:name,:models_count).desc(:name)
-    rets = cache( "genres", :expires_in => 3600000 ) do
+    rets = cache( "genres", :expires_in => 0 ) do
       Genremodel.all.only(:id,:name,:models_count).asc(:name)
     end
     
-    expires 36000 ,:public
-    cache_control :public, 36000
+    expires 0 ,:public
+    cache_control :public, 0
     
     content_type  'application/json; charset=utf-8'
     if rets.nil?

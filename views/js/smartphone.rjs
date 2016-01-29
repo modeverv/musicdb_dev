@@ -23,6 +23,7 @@ function init(){
     $(".search-btn").on("click",function(){
         var kind = $(this).data("kind");
         var qs = $("#search-text-" + kind).val();
+        $(".search-text").val(qs);
         PAGE.search(kind,qs);
     });
     $("ul").on("click","a.pageli",function(){
@@ -75,10 +76,12 @@ function init(){
 
 var PAGE = (function(){
                 function _get(url,param,callback){
-                    $.mobile.loading('show', {theme:"a", text:"Please wait...", textVisible: true}); // This will show AJAX spinner
+		    $("#overlay").toggle();
+                    $.mobile.loading('show', {theme:"a", text:"Please wait...", textVisible: true});
                     $.ajax({
                                type:"GET",
                                url :url,
+                               cache: false,
                                data:param,
                                dataType:"json"
                            }).done(function(json){
@@ -98,8 +101,9 @@ var PAGE = (function(){
                     if(donavigation != false){
                         //$.mobile.navigate("#" + kind);
                         $('body').pagecontainer('change', "#" + kind,
-                                                { transition: 'flow' } );
+                                                { transition: 'slidefade' } );
                     }
+		    $("#overlay").toggle();
                     $.mobile.loading('hide');
                 }
                 function okext(data){
@@ -309,7 +313,7 @@ var PLAYER = (function(){
                       artist = data.artist;
                       album = data.album;
                       title = data.title;
-                      var text = title + " by " + artist + " - " + album + " #NowPlaying";
+                      var text = title + " by " + artist + " - " + album + " #NowPlaying #musicdb";
                       var button = '<a href="https://twitter.com/share" class="twitter-share-button" data-url=\" \" data-text="' + text +'" data-via="" data-lang="ja" data-related="" data-hashtags=""></a>';
                       $(".share").html("");
                       $(".share").html(button);
