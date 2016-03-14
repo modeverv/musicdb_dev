@@ -70,11 +70,12 @@
     </script>
 </head>
 <body>
-<!--  
+  
 <div data-role="page" id="index" data-theme="b">
   <h1 style="text-align:center">musicdb_dev::smartphone</h1>
+  <h1 style="text-align:center"><a href="#" class="init">init</a></h1>
 </div>  
--->
+
 <% ["genre","artist","album","track"].each do |kind| %>
 <div data-role="page" class="ui-page" id="<%= kind %>" data-theme="b">
   <header id="header" data-id="common_header" data-role="header"

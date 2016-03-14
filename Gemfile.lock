@@ -1,3 +1,9 @@
+GIT
+  remote: git://github.com/eventmachine/eventmachine.git
+  revision: 8cfcc0e20918b8db7db473fcd857e7b0eaadf134
+  specs:
+    eventmachine (1.2.0.dev.2)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -17,7 +23,6 @@ GEM
     cicphash (1.1.0)
     domain_name (0.5.22)
       unf (>= 0.0.5, < 1.0.0)
-    eventmachine (1.0.3)
     flacinfo-rb (1.0)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
@@ -145,6 +150,7 @@ PLATFORMS
 DEPENDENCIES
   bson (= 1.7.0)
   bson_ext (= 1.7.0)
+  eventmachine!
   iconv
   mecab
   mechanize

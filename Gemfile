@@ -1,4 +1,5 @@
 source 'http://rubygems.org'
+gem 'eventmachine', github: "eventmachine/eventmachine"
 gem 'iconv'
 gem 'padrino','0.10.7'
 gem 'padrino-core','0.10.7'
