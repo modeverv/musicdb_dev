@@ -316,7 +316,7 @@ AppPageElement.prototype = {
 //                        var ot = (this.offsetTop - magickoffset) < 0 ? 0 : this.offsetTop - magickoffset;
                         var offset = $(this).offset();
                         var ot = (offset.top);// - magickoffset) < 0 ? 0 : offset.top - magickoffset;
-console.log("offset:" + offset.top + " / ot:" + ot);
+//console.log("offset:" + offset.top + " / ot:" + ot);
                         if(_this.name == "## ALL ##"){
                             if(!AppPage.current_selected[_this.nkind]){
                                 return;

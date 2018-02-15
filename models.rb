@@ -32,7 +32,7 @@ begin
   Mongoid.load!( File.dirname(__FILE__) + "/mongoid.yml",:production)
 rescue
   Mongoid.configure do |config|
-    config.master = Mongo::Connection.new('localhost').db('music2-mongoid')
+    config.master = Mongo::Connection.new('127.0.0.1').db('music2-mongoid2')
     # config.master = Mongo::Connection.new('localhost').db('photo-mongoid2')
     #  config.identity_map_enabled = true
   end
@@ -81,7 +81,7 @@ EOT
 #    Statistics.map_reduce(m,r).find.sort('value.count',:desc)
 #    Statistics.find.sort('value.count',:desc)
   end
-  
+
 end
 
 class Genremodel
@@ -114,7 +114,7 @@ class Musicmodel
   include Mongoid::Document
 
   field :path, type: String, :default => ''
-  
+
   field :genre, type: String, :default => 'Unknown'
   field :artist,type: String, :default => 'Unknown'
   field :album, type: String, :default => 'Unknown'
@@ -128,7 +128,7 @@ class Musicmodel
 #  index :path
 #  index :search
 #  index :artist
-  
+
   has_and_belongs_to_many :genremodels
 
   before_save :force_utf8
@@ -153,7 +153,7 @@ class Musicmodel
     puts "page:#{page}"
     puts "per :#{per}"
     puts "snum:#{skipnum}"
-    
+
     retcount = Musicmodel.where(:genre => query).only(:id,:album,:genre,:artist,:ext,:tag,:title,:path).size
     status = {:status => 'ok' ,:page => page,:total => retcount,:next => "no",:prev => "no",:qs => query}
     status[:next] = "yes" if retcount > page * per #TODO 境界微妙
@@ -170,7 +170,7 @@ class Musicmodel
   def self.feeling_lucky(page,per)
     retcount = Musicmodel.all.only(:genre,:id,:album,:artist,:ext,:tag,:title,:path).size
     skipnum = rand(retcount)
-    
+
     status = {:status => 'ok' ,:page => page ,:total => retcount,:next => "yes",:prev => "no",:qs => "Are You Feeling Lucky?"}
 
     rets = Musicmodel.all.skip(skipnum).limit(per).only(:genre,:id,:album,:artist,:ext,:tag,:title,:path).to_a
@@ -179,7 +179,29 @@ class Musicmodel
     puts ex
     [{:status => 'ng',:page => 0,:next => "no",:prev => "no"},[{}]]
   end
-  
+
+  def self.newest(page,per)
+    skipnum=(page-1) * per
+
+    retcount = Musicmodel.order_by(:update_at.desc).only(:genre,:id,:album,:artist,:ext,:tag,:title,:path).size
+    status = {:status => 'ok' ,:page => page,:total => retcount,:next => "no",:prev => "no",:qs => "Newest"}
+    status[:next] = "yes" if retcount > page * per #TODO 境界微妙
+    status[:prev] = "yes" if page > 1
+
+    rets = Musicmodel.order_by(:update_at.desc)
+           .only(:genre,:id,:album,:artist,:ext,:tag,:title,:path)
+           .skip(skipnum).limit(per).to_a
+    #    rets.each do |e|
+    #      if e.thumb.nil?
+    #        e.thumb = Musicmodel.get_thumb
+    #      end
+    #    end
+    [status,rets]
+  rescue => ex
+    puts ex
+    [{:status => 'ng',:page => 0,:next => "no",:prev => "no"},[{}]]
+  end
+
   def self.search(query,page=1,per=10)
     page = page.to_i
     per = per.to_i
@@ -190,7 +212,11 @@ class Musicmodel
     if query == "FeelingLucky"
       return Musicmodel.feeling_lucky(page,per)
     end
-    
+
+    if query == "+new"
+      return Musicmodel.newest(page,per)
+    end
+
     qs2 = query.gsub('<OR>','|').split('|').join(' ')
     keywords = MeCab::Tagger.new("-Owakati").parse(qs2).split(' ').map{|e| /^#{e.downcase}/}
 

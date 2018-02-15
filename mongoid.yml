@@ -2,6 +2,5 @@ production:
     sessions:
         default:
             hosts:
-                - localhost:27017
+                - 127.0.0.1:27017
             database: music2-mongoid
-

@@ -329,7 +329,7 @@ var AppPageElementHandler = {
 var offset = $(_this).offset();
 //        var ot = _this.offsetTop - magic;
         var ot = offset.top - magic;
-console.log("offset.top:" + offset.top + "/ot:"+ot);
+//console.log("offset.top:" + offset.top + "/ot:"+ot);
         ot = ot < 0 ? 0 : ot;
         for(var i=0,t=AppPage.get_sub(kind),l=t.length;i<l;i++){
             $("#" + t[i] + " h2").css({"padding-top":ot});
@@ -688,7 +688,7 @@ var AppHandler = {
         if(mode == "files"){
             html += "<a href=\"javascript:void();\"id=\"store\" style=\"marign-left:5px;\" onclick=\"AppHandler.set_store(\'" + midskey +  "\');return false;\"> store </a>";
         }
-console.log(html);
+//console.log(html);
         $.prettyPhoto.open(
             link,
             'pretty',

@@ -80,7 +80,7 @@ function my_interval(){
                     }
                 }
             } catch (x) {
-                console.log(x);
+                //console.log(x);
                 $("#word").fadeOut(10);
                 $("#bio").fadeIn(10);
                 $("#wikipedia").fadeIn(10);
@@ -202,7 +202,9 @@ function get_statistics(mid,name){
     $.ajax({
                url:'<%= @prefix %>/api/statistics',
                data:{mid:mid,name:name,t:(new Date)/1},
-               success:function(msg){console.log(msg);}
+               success:function(msg){
+	       //console.log(msg);
+	       }
            });  
 }
 

@@ -7,7 +7,7 @@ var app = express.createServer();
 
 //var musicdb = mongoose.createConnection('mongodb://192.168.110.7/misic-mongoid');
 //var mediadb2 = mongoose.createConnection('mongodb://192.168.110.7/media-mongoid4');
-var musicdb = mongoose.createConnection('mongodb://localhost/music2-mongoid');
+var musicdb = mongoose.createConnection('mongodb://localhost/music2-mongoid2');
 var mediadb2 = mongoose.createConnection('mongodb://localhost/mediadb2-mongoid');
 
 var MusicmodelSchema = new mongoose.Schema({

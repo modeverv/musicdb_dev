@@ -5,21 +5,20 @@ class GlobServerFiles
   def initialize args={}
     @count = 0
     @folders = args[:folders] ||= [
-#                                   "/var/smb/sdb1/video2/作成",
-#                                   "/var/smb/sdb1/music/iTunes1",
-#                                   "/var/smb/sdb1/music/iTunes2",
-#                                   "/var/smb/sdb1/music/iTunes3",
-#                                   "/var/smb/sdb1/music/iTunes2011",
-#                                   "/var/smb/sdb1/music/iTunes2012",
-#                                   "/var/smb/sdb1/music/iTunes2013",
-#                                   "/var/smb/sdb1/music/iTunes2014",
-                                   "/var/smb/sdb1/music",
-#                                   "/var/smb/sdb1/music/iTunes2015",
-                                   "/var/smb/sdb1/music/iTunes2016",
-#                                   "/var/smb/sdb1/music/iTunesMac",
-#                                   "/var/smb/sdb1/music/iTunesLossless",
-#                                   "/var/smb/sdb1/music/iTunesMusicMBP",
-                                  ]
+#      "/var/smb/sdb1/music/2012_2",
+#      "/var/smb/sdb1/music/iTunes",
+#      "/var/smb/sdb1/music/iTunes1",
+#      "/var/smb/sdb1/music/iTunes2",
+#      "/var/smb/sdb1/music/iTunes2014",
+#      "/var/smb/sdb1/music/iTunes2015Mac",
+#      "/var/smb/sdb1/music/iTunes3",
+#      "/var/smb/sdb1/music/iTunesLossless",
+#      "/var/smb/sdb1/music/kujiDropBox",
+#      "/var/smb/sdb1/music/music",
+      "/var/smb/sdb1/music/iTunes2016",
+      "/var/smb/sdb1/music/iTunes2017",
+      #      "/var/smb/sdb1/music",      
+    ]
     @ext = args[:ext] ||= [
                            'MP3',
                            'M4A',
@@ -86,12 +85,12 @@ class GlobServerFiles
       @ext.each do |ext|
         Dir.glob("#{folder}/**/*.#{ext.downcase}") do |element|
           @count += 1
-          # puts "down - #{@count} - #{element}"
+          puts "downcase - #{@count} - #{element}"
           yield element
         end
         Dir.glob("#{folder}/**/*.#{ext}") do |element|
           @count += 1
-          # puts "upper - #{@count} - #{element}"
+          puts "uppercase - #{@count} - #{element}"
           yield element
         end
         
