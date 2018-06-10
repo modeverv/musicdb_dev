@@ -6,8 +6,9 @@ require 'mongoid'
 require 'kconv'
 #require 'MeCab'
 require 'mecab'
+require 'natto'
 require 'taglib'
-require 'taglib2'
+#require 'taglib2'
 require 'mp3info'
 require File.dirname(__FILE__) + '/audioinfo_mod.rb'
 require File.dirname(__FILE__)+'/globmodel2.rb'
@@ -36,6 +37,7 @@ rescue
     # config.master = Mongo::Connection.new('localhost').db('photo-mongoid2')
     #  config.identity_map_enabled = true
   end
+  puts "configure!!!"
 end
 
 class Mid
@@ -218,6 +220,19 @@ class Musicmodel
     end
 
     qs2 = query.gsub('<OR>','|').split('|').join(' ')
+
+##     txt = qs2.downcase
+##     nm = Natto::MeCab.new
+##     nm.parse(txt) do |n|
+##       x = ""
+##       begin
+##         x = n.surface
+##       rescue => e
+##         pp e
+##       end
+##       a << x
+##     end
+
     keywords = MeCab::Tagger.new("-Owakati").parse(qs2).split(' ').map{|e| /^#{e.downcase}/}
 
     retcount = Musicmodel.where(:search.all => keywords).only(:genre,:id,:album,:artist,:ext,:tag,:title,:path).size
@@ -237,28 +252,48 @@ class Musicmodel
     puts ex
     [{:status => 'ng',:page => 0,:next => "no",:prev => "no"},[{}]]
   end
-  
+
   def force_utf8
-    self.genre = self.genre.toutf8
-    self.artist= self.artist.toutf8
-    self.album = self.album.toutf8
+    self.genre = self.genre.scrub.toutf8
+    self.artist= self.artist.scrub.toutf8
+    self.album = self.album.scrub.toutf8
     self.ext   = File.extname(self.path).gsub('.','').downcase.toutf8
-    self.tag   = self.tag.toutf8
-    self.title = self.title.toutf8
+    self.tag   = self.tag.scrub.toutf8
+    self.title = self.title.scrub.toutf8
   end
-  
+
   def force_utf8_2
 #    self.path  = self.path.toutf8
   end
-  
+
   def update_update_at
+    puts "update_update_at"
     self.update_at = Time.now
   end
 
   def update_search
-    mecab = MeCab::Tagger.new("-Owakati")
-    emit = mecab.parse("#{self.path} #{self.genre} #{self.artist} #{self.album} #{self.title} #{self.ext} #{self.tag} ".toutf8.downcase).split(' ').uniq
+#    puts "update_search"
+    #mecab = MeCab::Tagger.new("-Owakati")
+    mecab = MeCab::Tagger.new
+    a = []
+    txt = "#{self.path} #{self.genre} #{self.artist} #{self.album} #{self.title} #{self.ext} #{self.tag}".downcase
+    nm = Natto::MeCab.new
+    nm.parse(txt) do |n|
+      x = ""
+      begin
+        x = n.surface
+      rescue => e
+        pp e
+      end
+      a << x
+    end
+    begin
+      emit = mecab.parse("#{self.path.scrub} #{self.genre.scrub} #{self.artist.scrub} #{self.album.scrub} #{self.title.scrub} #{self.ext.scrub} #{self.tag.scrub}".scrub.downcase).split(' ').uniq
+    rescue => ex
+      emit = a
+    end
     self.search = emit
+#    puts "end update_search"
   end
 
   def update_tag(args)
@@ -290,84 +325,120 @@ class Musicmodel
   end
   
   def update_id3
-    p "self:path=>#{self.path}"
-    opener = "\"#{self.path.gsub(' ','\ ')}\""
+
+    puts "#################\nself.path => #{self.path}"
+    # opener = "\"#{self.path.gsub(' ','\ ')}\""
 
     if File.extname(self.path).downcase != '.wav'
-      begin #audioinfo is slow. use taglib2
-        if self.title == '' # is fail by taglib2
-          puts "try taglib2"
-          tag = ::TagLib2::File.new(self.path.to_str)
-          self.genre  = tag.genre.to_s.toutf8  if tag.genre
-          self.artist = tag.artist.to_s.toutf8 if tag.artist
-          self.album  = tag.album.to_s.toutf8  if tag.album
-          self.title  = tag.title.to_s.toutf8  if tag.title
-#          if tag.image
-#            path = nil
-#            tmp = Tempfile.open(['tm','image'],'/tmp') do |io|
-#              io.puts "#EXTM3U"
-#              io.puts tag.image.data
-#              path = io.path
-#            end
-#            buff_m = `convert -define jpeg:size=200x200 -resize 200x200 -quality 90 -strip "#{path}" -`
-#            self.thumb = [buff_m].pack('m')
-#          end
+##        begin #audioinfo is slow. use taglib2
+##          if self.title == '' # is fail by taglib2
+##            puts "try taglib2"
+##            tag = ::TagLib2::File.new(self.path.to_str)
+##            self.genre  = tag.genre.to_s.toutf8  if tag.genre
+##            self.artist = tag.artist.to_s.toutf8 if tag.artist
+##            self.album  = tag.album.to_s.toutf8  if tag.album
+##            self.title  = tag.title.to_s.toutf8  if tag.title
+##  #          if tag.image
+##  #            path = nil
+##  #            tmp = Tempfile.open(['tm','image'],'/tmp') do |io|
+##  #              io.puts "#EXTM3U"
+##  #              io.puts tag.image.data
+##  #              path = io.path
+##  #            end
+##  #            buff_m = `convert -define jpeg:size=200x200 -resize 200x200 -quality 90 -strip "#{path}" -`
+##  #            self.thumb = [buff_m].pack('m')
+##  #          end
+##          end
+##        rescue => ex
+##          puts "tablib2"
+##          p ex
+##        ensure
+##          buff_m = nil
+##        end
+
+      begin
+        if self.title == ''
+          taglib_class = {'.mp3' => TagLib::MPEG::File, '.m4a' => TagLib::MP4::File, '.flac' => TagLib::FLAC::File ,'.ogg' => TagLib::Ogg::Vorbis::File }
+#          puts "try taglib"
+          pp self.path
+          taglib_class[File.extname("#{self.path}").downcase].open(self.path) do |f|
+            self.genre  = f.tag.genre.to_s.scrub.toutf8  if f.tag.genre
+            self.artist = f.tag.artist.to_s.scrub.toutf8 if f.tag.artist
+            self.album  = f.tag.album.to_s.scrub.toutf8  if f.tag.album
+            self.title  = f.tag.title.to_s.scrub.toutf8  if f.tag.title
+          end
         end
       rescue => ex
-        puts "tablib2"
+        puts "taglib"
         p ex
       ensure
         buff_m = nil
       end
 
-      begin
-        if self.title == '' # is fail by taglib2
-          puts "try audioinfo"
-          AudioInfo.open("#{self.path}") do |tag|
-            debug tag.to_h  # { "artist" => "artist", "title" => "title", etc... }
-            self.genre  = tag.genre.to_s.toutf8  if tag.genre
-            self.artist = tag.artist.to_s.toutf8 if tag.artist
-            self.album  = tag.album.to_s.toutf8  if tag.album
-            self.title  = tag.title.to_s.toutf8  if tag.title
-          end
-        end
-      rescue AudioInfoError => ex
-        p ex
-        p tag
-      rescue =>ex
-        puts "try audioinfo"        
-        p ex
-        p tag
+##       begin
+##         if self.title == '' # is fail by taglib2
+##           puts "try audioinfo"
+##           AudioInfo.open("#{self.path}") do |tag|
+##             debug tag.to_h  # { "artist" => "artist", "title" => "title", etc... }
+##             self.genre  = tag.genre.to_s.toutf8  if tag.genre
+##             self.artist = tag.artist.to_s.toutf8 if tag.artist
+##             self.album  = tag.album.to_s.toutf8  if tag.album
+##             self.title  = tag.title.to_s.toutf8  if tag.title
+##           end
+##         end
+##       rescue AudioInfoError => ex
+##         p ex
+##         p tag
+##       rescue =>ex
+##         puts "ex try audioinfo"
+##         pp ex
+##         pp tag
+##       end
+
+##       begin
+##         if self.title == ''
+##           puts "try mp3info"
+##           Mp3Info.open("#{self.path}") do |mp3|
+##             tag = mp3.tag
+##             self.genre  = tag.genre.to_s.toutf8  if tag.genre
+##             self.artist = tag.artist.to_s.toutf8 if tag.artist
+##             self.album  = tag.album.to_s.toutf8  if tag.album
+##             self.title  = tag.title.to_s.toutf8  if tag.title
+##           end
+##         end
+##       rescue => ex
+##         puts "mp3info"
+##         p ex
+##       end
+    end
+
+    begin
+      if self.title == '' #is fail by taglib2 and audioinfo
+        self.title = File.basename(self.path).gsub(File.extname(self.path),'').toutf8
       end
+    rescue => ex
+      pp "title"
+      pp ex
+    end
 
-      begin
-        if self.title == ''
-          debug "try mp3info"
-          Mp3Info.open(self.path) do |mp3|
-            tag = mp3.tag
-            self.genre  = tag.genre.to_s.toutf8  if tag.genre
-            self.artist = tag.artist.to_s.toutf8 if tag.artist
-            self.album  = tag.album.to_s.toutf8  if tag.album
-            self.title  = tag.title.to_s.toutf8  if tag.title
-          end
-        end
-      rescue => ex
-        puts "try mp3info"
-        p ex
+    begin
+      if self.album.downcase == 'unknown' || self.album == ''
+        self.album = File.basename(File.dirname(self.path))
       end
-    end
-    
-    if self.title == '' #is fail by taglib2 and audioinfo
-      self.title = File.basename(self.path).gsub(File.extname(self.path),'').toutf8
-    end
-
-    if self.album.downcase == 'unknown' || self.album == ''
-      self.album = File.basename(File.dirname(self.path))
+    rescue => ex
+      pp "album"
+      pp ex
     end
 
-    if self.artist.downcase == 'unknown' || self.artist == ''
-      self.artist = File.basename(File.dirname(File.dirname(self.path)))
+    begin
+      if self.artist.downcase == 'unknown' || self.artist == ''
+        self.artist = File.basename(File.dirname(File.dirname(self.path)))
+      end
+    rescue => ex
+      pp "artist"
+      pp ex
     end
+#    puts "end of update_id3"
   end
 
   def get_thumb
@@ -524,17 +595,17 @@ class Musicmodel
    end
     
     def delete_not_exist_entry
-      rets = Musicmodel.all.only(:id,:path,:genremodels)
-      rets.each do |music|
-        puts "#{music.id} => #{music.path}"
-        if !File.exists?(music.path)
-          puts "not exist"
+       rets = Musicmodel.all.only(:id,:path,:genremodels)
+       rets.each do |music|
+         puts "#{music.id} => #{music.path}"
+         if !File.exists?(music.path)
+           puts "not exist"
           music.genremodels.all do |genre|
-            genre.musicmodels.find(music.id).delete
-          end
-          music.delete
-        end
-      end
+             genre.musicmodels.find(music.id).delete
+           end
+           music.delete
+         end
+       end
     end
 
 

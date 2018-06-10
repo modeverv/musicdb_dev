@@ -17,7 +17,7 @@ var AppServer = {
         this._server._proxypool = {  };
     },
     make_qdata : function(qdata){
-        qdata.p = parseInt(qdata.p);        
+        qdata.p = parseInt(qdata.p);
         qdata.dryp = qdata.p;
         qdata.per = 100;
         qdata.mode = "proxy";
@@ -488,11 +488,11 @@ var AppPage = {
         }
 
         if(kind == "title"){
-            AppPage.status.followflag =  c > 5000 ? false:true;
+            AppPage.status.followflag =  c > 10000 ? false:true;
             if(AppPage.status.followflag == false)
-                AppUtil.debug("<h3>Many Elements!<br/> Follow Mouse Disabled.</h3>",5000);
+                AppUtil.debug("<h3>Many Elements!<br/> Follow Mouse Disabled.</h3>",10000);
             else
-                AppUtil.debug("<h3>Follow Mouse Enabled.</h3>",5000);
+                AppUtil.debug("<h3>Follow Mouse Enabled.</h3>",10000);
         }
         AppHandler.grayout(kind);
     },
