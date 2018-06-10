@@ -20,7 +20,7 @@ end
 module Padrino
   module Cache
     module Store
-n      class File
+      class File
 
         def set(key, value, opts = nil)
           init
