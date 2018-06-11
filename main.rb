@@ -166,10 +166,10 @@ class MyApp < Sinatra::Application
     end
 
     def protected!
-      unless authorized?
-        response['WWW-Authenticate'] = %(Basic realm="musicdb_dev Restricted Area")
-        throw(:halt, [401, "Not authorized\n"])
-      end
+#      unless authorized?
+#        response['WWW-Authenticate'] = %(Basic realm="musicdb_dev Restricted Area")
+#        throw(:halt, [401, "Not authorized\n"])
+#      end
     end
 
     def ok_ip?
@@ -182,8 +182,8 @@ class MyApp < Sinatra::Application
 
 
     def authorized?
-      @auth ||=  Rack::Auth::Basic::Request.new(request.env)
-      @auth.provided? && @auth.basic? && @auth.credentials && @auth.credentials == ['seijiro','hoge']
+#      @auth ||=  Rack::Auth::Basic::Request.new(request.env)
+#      @auth.provided? && @auth.basic? && @auth.credentials && @auth.credentials == ['seijiro','hoge']
     end
 
     def get_tmpfile(&block)
