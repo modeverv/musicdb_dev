@@ -14,23 +14,23 @@ class GlobServerFiles
 
       #      "/var/smb/sdb1/music/iTunes1",
 
-            "/var/smb/sdb1/music/iTunes2",
+#            "/var/smb/sdb1/music/iTunes2",
 
-            "/var/smb/sdb1/music/iTunes2014",
+#            "/var/smb/sdb1/music/iTunes2014",
       
-            "/var/smb/sdb1/music/iTunes2015Mac",
+#            "/var/smb/sdb1/music/iTunes2015Mac",
       
-            "/var/smb/sdb1/music/iTunes3",
+#            "/var/smb/sdb1/music/iTunes3",
       
-            "/var/smb/sdb1/music/iTunesLossless",
+#            "/var/smb/sdb1/music/iTunesLossless",
       
-            "/var/smb/sdb1/music/kujiDropBox",
+#            "/var/smb/sdb1/music/kujiDropBox",
       
-            "/var/smb/sdb1/music/iTunes2016",
+#            "/var/smb/sdb1/music/iTunes2016",
       
-      "/var/smb/sdb1/music/iTunes2016/朝焼けのスターマインFLAC",
+#      "/var/smb/sdb1/music/iTunes2016/朝焼けのスターマインFLAC",
       
-            "/var/smb/sdb1/music/iTunes2017",
+#            "/var/smb/sdb1/music/iTunes2017",
       
       "/var/smb/sdb1/music/iTunes2018",
     ]

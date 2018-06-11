@@ -267,7 +267,7 @@ class Musicmodel
   end
 
   def update_update_at
-    puts "update_update_at"
+#    puts "update_update_at"
     self.update_at = Time.now
   end
 

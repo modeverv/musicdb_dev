@@ -1,9 +1,16 @@
 source 'http://rubygems.org'
 gem 'eventmachine', github: "eventmachine/eventmachine"
 gem 'iconv'
-gem 'padrino','0.10.7'
-gem 'padrino-core','0.10.7'
-gem 'sinatra',"1.3.1"
+
+#gem 'padrino','0.10.7'
+#gem 'padrino-core','0.10.7'
+#gem 'sinatra',"1.3.1"
+
+gem 'padrino'
+gem 'padrino-core'
+gem 'sinatra'
+gem 'activesupport'
+
 gem 'sinatra-xsendfile'
 gem 'sinatra-reloader'
 gem 'mechanize'
