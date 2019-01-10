@@ -433,7 +433,7 @@ AppPageElement.prototype = {
         _file_button : function(id,obj){
             var elem = "<a class='file_link' href=\'javascript:void();\' style='float:right;' onclick='AppHandler.do_pretty(\"#{link}\");return false;'>#</a>";
             var link = ('<%= @prefix %>/file/' + id + "");
-            elem = elem.replace('#{link}', link ); 
+            elem = elem.replace('#{link}', link );
             return elem;
         }
     }

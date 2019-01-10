@@ -1,5 +1,6 @@
 #! /bin/bash
 
+cd /var/www/ruby/musicdb_dev/node
 # source ~/.nvm/nvm.sh
 # nvm use 0.8.4
 which node

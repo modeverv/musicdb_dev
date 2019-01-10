@@ -215,8 +215,8 @@ class MyApp < Sinatra::Application
 #      str += "#EXTINF:1000,#{ret.artist} - #{title}\n"
 #      str += "http://#{request.host}/stream/musicdb/#{ret.id}/file.#{ret.ext}\n"
 
-      # varnish(:80) => node(:23001)
-      str += "#EXTINF:1000,#{ret.artist} - #{title} (varnish->node)\n"
+      # h2o(:443) => node(:23001)
+      str += "#EXTINF:1000,#{ret.artist} - #{title}\n"
       str += "http://#{request.host}/stream/musicdb/#{ret.id}/file.#{ret.ext}\n"
 
       # nginx(8080) => node(23001)

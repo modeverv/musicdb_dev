@@ -27,8 +27,8 @@ $(function(){
 
       //$("#main").typewriter();
       $(".play").css({
-                         "transform": "rotate(12deg)" ,           
-                         "-moz-transform": "rotate(13deg)" ,           
+                         "transform": "rotate(12deg)" ,
+                         "-moz-transform": "rotate(13deg)" ,
                          "-webkit-transform": "rotate(14deg)",
                          "transform-origin":"100% 100%",
                          "-moz-transform-origin":"100% 100%",
@@ -42,7 +42,7 @@ $(function(){
       get_similar();
       get_wikipedia();
       get_statistics(mid,"WEB:" + title + " - " + album + " - " + artist );
-      
+
       var seed = Math.floor(Math.random()*10 + 1); 
 //      if(seed > 7)
           do_visualize();
@@ -50,6 +50,7 @@ $(function(){
       my_interval();
 
   });
+
 function my_interval(){
     var testNext = function(){
         var ret = [];
@@ -112,7 +113,6 @@ function get_rylic(){
                        $("#word a").css({"color":"#fff"});
                }
            });
-    
 }
 
 function get_bio(){

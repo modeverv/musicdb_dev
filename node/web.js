@@ -55,14 +55,15 @@ app.get("/stream/musicdb/:mid/:param",function(req,res){
    console.log(oId);
 
     Musicmodel.findById(oId, function(err,doc){
-     console.log("aaa");
      if(doc){
-       console.log("path is %s",doc.path);
-       res.sendfile(doc.path,function(ferr){
-          if(ferr)
-            console.log("error %s",doc.path);
-          else
-            console.log("transfered %s",doc.path);
+       var path = doc.path;//.replace("//","/").replace(" ","");
+       console.log("path is %s", path);
+       res.sendFile(path, function(ferr){
+          if (ferr) {
+            console.log("error %s",path);
+          } else {
+            console.log("transfered %s",path);
+          }
        });
      } else {
        res.send("no doc error.");

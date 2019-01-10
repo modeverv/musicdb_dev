@@ -19,7 +19,9 @@
   </head>
   <body>
     <div class="leftbottom">
-      <h1 class="logo"><a href='<%= @prefix %>'><%= title %></a>::play</h1>
+      <h1 class="logo">
+				<a href='<%= @prefix %>'><%= title %></a>::play
+			</h1>
       <div id="similar"></div>
     </div>
 
@@ -34,9 +36,12 @@
     </div>
     
     <div id="main">
-      <div id="play"><div id="a_image"></div><div id="s_play">
+      <div id="play">
+				<div id="a_image"></div>
+				<div id="s_play">
           Playing
-        </div></div>
+        </div>
+			</div>
      
       <section id="m_title">
         <%= "#{@media.title}"  if @media.title.size > 0 %>
@@ -80,8 +85,7 @@
     <script src="<%= @prefix %>/scripts/swf.js"></script>
 
     <script src="<%= @prefix %>/processing.min.js"></script>
-    <script src="<%= @prefix %>/modernizr-0.9.min.js"></script>
-    
+    <!--<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>-->
   </body>
 </html>
 

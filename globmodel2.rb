@@ -5,7 +5,7 @@ class GlobServerFiles
   def initialize args={}
     @count = 0
     @folders = args[:folders] ||= [
-#      "/var/smb/sdb1/music/music",
+#       "/var/smb/sdb1/music/",
 
 
       #      "/var/smb/sdb1/music/2012_2",

@@ -748,7 +748,7 @@ var AppHandler = {
 };
 function init(){
     AppUtil.applyToSystem();
-    $.fn.prettyPhoto(); 
+    $.fn.prettyPhoto();
     AppHandler.genres();
     $("#wrapper").find("h2").click(
         function(){

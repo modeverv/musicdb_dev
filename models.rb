@@ -273,8 +273,7 @@ class Musicmodel
 
   def update_search
 #    puts "update_search"
-    #mecab = MeCab::Tagger.new("-Owakati")
-    mecab = MeCab::Tagger.new
+    mecab = MeCab::Tagger.new("-Owakati")
     a = []
     txt = "#{self.path} #{self.genre} #{self.artist} #{self.album} #{self.title} #{self.ext} #{self.tag}".downcase
     nm = Natto::MeCab.new
@@ -438,6 +437,9 @@ class Musicmodel
       pp "artist"
       pp ex
     end
+
+    self.genre  = "Unknown" if self.genre == ""
+
 #    puts "end of update_id3"
   end
 
