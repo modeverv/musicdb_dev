@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8">
+
     <meta name="apple-mobile-web-app-capable" content="yes"/>
 <!--    <meta http-equiv="Expires" content="<%=60*60*12%>">-->
     <title><%= title %></title>
@@ -71,7 +71,7 @@ function setSize() {
       <div id="search" class="search">
         <form id="frm_search" onsubmit="AppHandler.search({by:'search'});return false;">
            <input type="button" id="b_search" class="submit_button"  onclick="AppHandler.search({by:'search'});return false;"  value="Search">
-          <input type="text" class="text_field" value="FeelingLucky" id="f_query"/>
+           <input type="text" class="text_field" value="FeelingLucky" id="f_query" tabindex="1"/>
         </form>
         <div id="pagination">
            <input type="button" id="b_more" class="submit_button" onclick="AppHandler.search({by:'more'});return false;" value="More" />

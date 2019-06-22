@@ -161,7 +161,7 @@ class MyApp < Sinatra::Application
 
     def recent(query)
       status = {:status => 'ok' ,:page => 1,:total => 100,:next => "no",:prev => "no",:qs => query}
-      ret = Musicmodel.desc(:update_at).limit(100).to_a
+      ret = Musicmodel.desc(:update_at).limit(1000000).to_a
       [status,ret]
     end
 
@@ -217,7 +217,7 @@ class MyApp < Sinatra::Application
 
       # h2o(:443) => node(:23001)
       str += "#EXTINF:1000,#{ret.artist} - #{title}\n"
-      str += "http://#{request.host}/stream/musicdb/#{ret.id}/file.#{ret.ext}\n"
+      str += "http://seijiro:hoge@#{request.host}/stream/musicdb/#{ret.id}/file.#{ret.ext}\n"
 
       # nginx(8080) => node(23001)
       #    str += "#EXTINF:,N8080#{ret.artist} - #{title}\n"
@@ -382,7 +382,7 @@ class MyApp < Sinatra::Application
     @mret = [].to_json
     begin
       mids = Mid.find(id)
-      @mret = Musicmodel.where(:_id.in => mids.mids ).only(:_id,:title,:album,:genre,:artist,:tag,:path,:ext).to_a.to_json
+      @mret = Musicmodel.where(:_id.in => mids.mids ).only(:_id,:title,:album,:genre,:artist,:tag,:path,:ext).order_by(:path.asc).to_a.to_json
     rescue => ex
     end
     @prefix = get_prefix

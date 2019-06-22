@@ -5,34 +5,19 @@ class GlobServerFiles
   def initialize args={}
     @count = 0
     @folders = args[:folders] ||= [
-#       "/var/smb/sdb1/music/",
-
-
-      #      "/var/smb/sdb1/music/2012_2",
-
-      #      "/var/smb/sdb1/music/iTunes",
-
-      #      "/var/smb/sdb1/music/iTunes1",
-
-#            "/var/smb/sdb1/music/iTunes2",
-
-#            "/var/smb/sdb1/music/iTunes2014",
+##      "/var/smb/sdb1/music",
+#      "/var/smb/sdb1/music/iTunes",
+#      "/var/smb/sdb1/music/iTunes1",
+#      "/var/smb/sdb1/music/iTunes2",
+#      "/var/smb/sdb1/music/iTunes3",      
+#      "/var/smb/sdb1/music/iTunes2014",
+#      "/var/smb/sdb1/music/iTunes2015",
+#      "/var/smb/sdb1/music/iTunes2016",
+#      "/var/smb/sdb1/music/iTunes2017",
+#      "/var/smb/sdb1/music/iTunes2018",
+#      "/var/smb/sdb1/music/iTunesLossless",      
       
-#            "/var/smb/sdb1/music/iTunes2015Mac",
-      
-#            "/var/smb/sdb1/music/iTunes3",
-      
-#            "/var/smb/sdb1/music/iTunesLossless",
-      
-#            "/var/smb/sdb1/music/kujiDropBox",
-      
-#            "/var/smb/sdb1/music/iTunes2016",
-      
-#      "/var/smb/sdb1/music/iTunes2016/朝焼けのスターマインFLAC",
-      
-#            "/var/smb/sdb1/music/iTunes2017",
-      
-      "/var/smb/sdb1/music/iTunes2018",
+      "/var/smb/sdb1/music/iTunes2019",
     ]
     @ext = args[:ext] ||= [
                            'MP3',
@@ -57,9 +42,13 @@ class GlobServerFiles
                                   "/var/smb/sdb1/music/iTunes2014",
                                   "/var/smb/sdb1/music/iTunes2015",
                                   "/var/smb/sdb1/music/iTunes2016",
+                                  "/var/smb/sdb1/music/iTunes2017",                                  
+                                  "/var/smb/sdb1/music/iTunes2018",
+                                  "/var/smb/sdb1/music/iTunes2019",
                                   "/var/smb/sdb1/music/iTunesMac",
                                   "/var/smb/sdb1/music/iTunesLossless",
                                   "/var/smb/sdb1/music/iTunesMusicMBP",
+
                                   ]
     @ext = args[:ext] ||= [
                            'MP3',

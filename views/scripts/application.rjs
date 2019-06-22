@@ -19,7 +19,7 @@ var AppServer = {
     make_qdata : function(qdata){
         qdata.p = parseInt(qdata.p);
         qdata.dryp = qdata.p;
-        qdata.per = 100;
+        qdata.per = 1000000;
         qdata.mode = "proxy";
         return qdata;
     },
@@ -488,7 +488,7 @@ var AppPage = {
         }
 
         if(kind == "title"){
-            AppPage.status.followflag =  c > 10000 ? false:true;
+            AppPage.status.followflag =  c > 1000000 ? false:true;
             if(AppPage.status.followflag == false)
                 AppUtil.debug("<h3>Many Elements!<br/> Follow Mouse Disabled.</h3>",10000);
             else

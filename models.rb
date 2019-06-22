@@ -175,7 +175,7 @@ class Musicmodel
 
     status = {:status => 'ok' ,:page => page ,:total => retcount,:next => "yes",:prev => "no",:qs => "Are You Feeling Lucky?"}
 
-    rets = Musicmodel.all.skip(skipnum).limit(per).only(:genre,:id,:album,:artist,:ext,:tag,:title,:path).to_a
+    rets = Musicmodel.all.skip(skipnum).limit(100).only(:genre,:id,:album,:artist,:ext,:tag,:title,:path).to_a
     [status,rets]
   rescue => ex
     puts ex
@@ -240,7 +240,7 @@ class Musicmodel
     status[:next] = "yes" if retcount > page * per #TODO 境界微妙
     status[:prev] = "yes" if page > 1
 
-    rets = Musicmodel.where(:search.all => keywords).only(:genre,:id,:album,:artist,:ext,:tag,:title,:path)
+    rets = Musicmodel.where(:search.all => keywords).only(:genre,:id,:album,:artist,:ext,:tag,:title,:path).order_by(:path.asc)
       .skip(skipnum).limit(per).to_a
     #    rets.each do |e|
     #      if e.thumb.nil?

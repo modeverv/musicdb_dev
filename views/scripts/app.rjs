@@ -16,13 +16,13 @@ var AppServer = {
     },
     search : function(qdata) {
         qdata.p = parseInt(qdata.p);
-        qdata.per  = 50;
+        qdata.per  = 50000;
         qdata.mode = "proxy";
         qdata.dryp = qdata.p;
         this._server.get('search', qdata,AppHandler.callback_search);
     },
     search_by_genre : function(qdata) {
-        qdata.per  = 50;
+        qdata.per  = 50000;
         qdata.mode = "proxy";
         qdata.dryp = qdata.p;
         this._server.get('search_by_genre', qdata ,AppHandler.callback_search_by_genre);
