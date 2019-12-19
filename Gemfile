@@ -14,7 +14,7 @@ gem 'activesupport'
 gem 'sinatra-xsendfile'
 gem 'sinatra-reloader'
 gem 'mechanize'
-gem 'rack',"1.4.1"
+gem 'rack',"1.6.12"
 gem 'mongoid',">= 2.3.0"
 gem 'mongo',">= 1.7.0"
 gem 'bson',">= 1.7.0"
