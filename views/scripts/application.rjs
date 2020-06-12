@@ -367,10 +367,11 @@ AppPageElement.prototype = {
                 " onmouseout=\"AppPageElementHandler.onmout(this)\" " +
                 ">" +
                 _this[kind] +
+                
                 (kind != "title" ? ("(<div class='old'>" + num + "</div>)") : "") +
                 "<span class='p'" + " onclick=\"AppPageElementHandler.Kclick(this)\"" + " >w</span>" +
-                (kind != "title" ? "<span class='g' style='margin-right:5px;' " + " onclick=\"AppPageElementHandler.Gclick(this)\"" + " >g</span>" : "") +
-                (kind != "title" ? "<span class='t' style='margin-right:5px;' " + " onclick=\"AppPageElementHandler.Tclick(this)\"" + " >t</span>" : "") +
+                /*(kind != "title" ? "<span class='g' style='margin-right:5px;' " + " onclick=\"AppPageElementHandler.Gclick(this)\"" + " >g</span>" : "") +*/
+                (kind != "title" ? "<span class='t' style='margin-right:5px;' " + " onclick=\"AppPageElementHandler.Tclick(this)\"" + " >t</span>" : "") +                
                 (kind != "title" ? "<span class='m' style='margin-right:5px;' " + " onclick=\"AppPageElementHandler.Mclick(this)\"" + " >m</span>" : "") +
                 "</li>");
             elem.attr({ "id": kind + "-" + _this[kind] });
