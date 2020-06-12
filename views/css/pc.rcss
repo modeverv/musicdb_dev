@@ -1,6 +1,7 @@
 /* reset */
 /*@import url(http://fonts.googleapis.com/css?family=Josefin+Sans|Rock+Salt|Shadows+Into+Light);*/
-@import url(//fonts.googleapis.com/css?family=Josefin+Sans|Rock+Salt|Gochi+Hand);
+/*@import url(//fonts.googleapis.com/css?family=Josefin+Sans|Rock+Salt|Gochi+Hand);*/
+@import url(//fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c);
 
 * {
    margin:0;
@@ -25,6 +26,7 @@ html{
 }
 body {
    font-family:'Josefin Sans',"ＤＦ細丸ゴシック体","Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ ProN W3",sans-serif;
+   font-family:'M PLUS Rounded 1c',"ＤＦ細丸ゴシック体","Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ ProN W3",sans-serif;   
    font-size:18px;
    line-height:1.5;
    color:#000;
@@ -32,9 +34,11 @@ body {
 /*   overflow-x:hidden;*/
    width:100%;
    font-weight:lighter;
-   backgound:none !important;
+   background-color: #000;
+/*   color: #fff;*/
+/*   background:none !important;*/
 /*   background:#fff */
-/*   background:url('<%= @prefix %>/api/backjpg?<%= Time.new.to_i.to_s.slice(0,8) %>') no-repeat fixed ; */
+   background:url('<%= @prefix %>/api/backjpg?<%= Time.new.to_i.to_s.slice(0,8) %>') no-repeat fixed ; 
 }
 /* layout */
 header,footer , #wrapper {

@@ -79,9 +79,19 @@ function(key, values){
   return { count: sum };
 }
 EOT
-    Statistics.collection.map_reduce(m,r,{ out: 'result' }).find.sort('value.count',:desc)
+#results = Thing.collection.map_reduce(map, reduce, out: "vr")
+#Model.where(field: value).map_reduce(map, reduce).out(inline: true)
+#Statistics.where(1 => 1).map_reduce(m,r).out(inline: true).find.sort('value.count',:desc)
+result = Statistics.map_reduce(m, r).out(replace: "result").find.sort{|a,b| 
+   b["value"]["count"].to_i <=> a["value"]["count"].to_i
+}#.sort('value.count :desc')
+#Statistics.collection.map_reduce(m,r,{ out: 'result' }).find.sort('value.count',:desc)
 #    Statistics.map_reduce(m,r).find.sort('value.count',:desc)
 #    Statistics.find.sort('value.count',:desc)
+result.each{|e|
+   p e["value"]["count"]
+}
+result
   end
 
 end

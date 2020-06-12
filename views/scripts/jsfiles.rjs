@@ -205,7 +205,8 @@ function docwrite(json){
     $("#m_tag").html(json.tag);
     $("#m_path").html(json.path);
 //    var url = "http://" + location.host  + "<%= @prefix %>/api/stream2/" + json._id + "/file." + json.ext ;
-    var url = "//" + location.host  + "/stream/musicdb/" + json._id + "/file." + json.ext ;
+//var url = "//" + location.host  + "/stream/musicdb/" + json._id + "/file." + json.ext ;
+var url = "//" + location.host  + "/stream<%= @prefix %>/" + json._id + "/file." + json.ext ;
 //    var url = "http://" + location.host + json.path.replace("/var/smb/sdb1","/resource")  ;
 //    var url = json.path.replace("/var/smb/sdb1","/resource");
     $("#m_url").html(url);

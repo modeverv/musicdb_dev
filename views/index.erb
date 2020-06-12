@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="<%= @prefix %>/css/pc.css" type="text/css" media="screen" />
     <link rel="stylesheet" href="<%= @prefix %>/css/prettyPhoto.css" type="text/css" media="screen" />
     <link rel="stylesheet" href="<%= @prefix %>/jquery.jgrowl.css" type="text/css" media="screen" />
+    <link rel="shortcut icon" href="favicon.ico">
 
 <!--    
     <link href="<%= @prefix %>/iphone.css" rel="stylesheet" type= "text/css" media="only screen and (max-device-width: 480px)">
@@ -90,7 +91,7 @@ function setSize() {
         </form>
           <a class="submit_a" href="<%= @prefix %>/welcome" onclick="AppHandler.popen(this);return false;">help</a>
           <a class="submit_a" href="<%= @prefix %>/stored" onclick="AppHandler.popen(this);return false;">stored</a>
-          <!--<a class="submit_a" href="<%= @prefix %>/statistics" onclick="AppHandler.popen(this);return false;">statistics</a>-->
+          <a class="submit_a" href="<%= @prefix %>/statistics" onclick="AppHandler.popen(this);return false;">statistics</a>
           <input type="button" class="submit_button" onclick="AppHandler.web('page');return false;" value="web" >
           <input type="button" class="submit_button" onclick="AppHandler.m3u('page');return false;" value="m3u" >
           <input type="button" class="submit_button" onclick="AppHandler.gzip('page');return false;" value="gzip" >

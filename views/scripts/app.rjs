@@ -16,7 +16,7 @@ var AppServer = {
     },
     search : function(qdata) {
         qdata.p = parseInt(qdata.p);
-        qdata.per  = 50000;
+        qdata.per  = 1000;
         qdata.mode = "proxy";
         qdata.dryp = qdata.p;
         this._server.get('search', qdata,AppHandler.callback_search);

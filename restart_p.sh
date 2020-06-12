@@ -4,7 +4,7 @@ echo $PID
 ps ax|grep unicorn
 kill -USR2 $PID
 echo "waiting..."
-sleep 10
+sleep 5
 kill -QUIT $PID
 echo "waiting..."
 sleep 5

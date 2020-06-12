@@ -61,7 +61,7 @@ require 'json'
 ##########################################################################################
 def get_prefix
   ""
-  "/musicdb_dev"
+  "/musicdb"
 end
 
 Encoding.default_internal = Encoding.find("UTF-8")
@@ -98,7 +98,7 @@ class MyApp < Sinatra::Application
   # need modify via environment
   helpers do
     def title
-      "musicdb_dev"    
+      "musicdb"    
     end
 
     def get_ip
@@ -217,7 +217,11 @@ class MyApp < Sinatra::Application
 
       # h2o(:443) => node(:23001)
       str += "#EXTINF:1000,#{ret.artist} - #{title}\n"
-      str += "http://seijiro:hoge@#{request.host}/stream/musicdb/#{ret.id}/file.#{ret.ext}\n"
+      if request.host =~ /music\./
+        str += "https://seijiro:hoge@#{request.host}/stream/#{ret.id}/file.#{ret.ext}\n"
+      else
+        str += "https://seijiro:hoge@#{request.host}/stream/musicdb/#{ret.id}/file.#{ret.ext}\n"
+      end
 
       # nginx(8080) => node(23001)
       #    str += "#EXTINF:,N8080#{ret.artist} - #{title}\n"
@@ -351,8 +355,26 @@ class MyApp < Sinatra::Application
     erb :index
   end
 
+  get "/" do #,:cache => true do
+    ua = request.user_agent
+    if ["Android","iPhone"].find{|s| ua.include?(s)}
+      redirect to( "#{get_prefix}/smartphone")
+    end
+    protected!
+    @config = "sinatra"
+    @prefix = ""
+    expires 36000
+    cache_control :public, 36000
+    erb :index
+  end
+
   get "#{get_prefix}/ip" do #,:cache => false do
 #     "cached?"
+     ip = env["X_Forwarded_For"] || env["Http_X_Forwarded_For"] || env["X_FORWARDED_FOR"] ||env["HTTP_X_FORWARDED_FOR"] || request.ip
+     ip
+  end
+
+  get "/ip" do #,:cache => false do
      ip = env["X_Forwarded_For"] || env["Http_X_Forwarded_For"] || env["X_FORWARDED_FOR"] ||env["HTTP_X_FORWARDED_FOR"] || request.ip
      ip
   end
@@ -365,9 +387,17 @@ class MyApp < Sinatra::Application
     ## node version
     @media = Musicmodel.find(params[:mediaid])
     @mediaurl ="/stream/musicdb/#{params[:mediaid]}/file.#{@media.ext}"
-
-
     @prefix = get_prefix
+    cache_control :public, :max_age => 60* 60 * 12
+    expires 60 * 60 * 24#,:public
+    erb :swf
+  end
+
+  get "/file/:mediaid" do
+    protected!
+    @media = Musicmodel.find(params[:mediaid])
+    @mediaurl ="/stream/#{params[:mediaid]}/file.#{@media.ext}"
+    @prefix = ""
     cache_control :public, :max_age => 60* 60 * 12
     expires 60 * 60 * 24#,:public
     erb :swf
@@ -389,6 +419,23 @@ class MyApp < Sinatra::Application
     erb :files
   end
 
+  get "/files/:midskey" do
+    protected!
+    expires 36000
+    cache_control :public, 36000
+    id = params[:midskey]
+    mids = nil
+    @mret = [].to_json
+    begin
+      mids = Mid.find(id)
+      @mret = Musicmodel.where(:_id.in => mids.mids ).only(:_id,:title,:album,:genre,:artist,:tag,:path,:ext).order_by(:path.asc).to_a.to_json
+      @mret.each{|a| logger.error(a)}
+    rescue => ex
+    end
+    @prefix = ""
+    erb :files
+  end
+
   get "#{get_prefix}/stored" do
     protected!
     cache_control :public, :max_age => 0
@@ -396,6 +443,16 @@ class MyApp < Sinatra::Application
     @config = "sinatra"
     @result = Stored.all.desc(:created_at)
     @prefix = get_prefix
+    erb :stored
+  end
+
+  get "/stored" do
+    protected!
+    cache_control :public, :max_age => 0
+    expires 0
+    @config = "sinatra"
+    @result = Stored.all.desc(:created_at)
+    @prefix = ""
     erb :stored
   end
 
@@ -409,6 +466,13 @@ class MyApp < Sinatra::Application
     erb :statistics
   end
 
+  get "/statistics" do
+      @config = "sinatra"
+      @result = Statistics.count
+      @prefix = ""
+      erb :statistics
+  end
+  
   get "#{get_prefix}/welcome" do #,:cache => true do
     expires 36000000
     cache_control :public, 3600000
@@ -417,10 +481,25 @@ class MyApp < Sinatra::Application
     erb :welcome
   end
 
+  get "/welcome" do
+    expires 36000000
+    cache_control :public, 3600000
+    @config = "sinatra"
+    @prefix = ""
+    erb :welcome
+  end
+
   get "#{get_prefix}/smartphone" do
     protected!
     @config = "sinatra"
-    @prefix = get_prefix
+    @prefix = ""
+    erb :smartphone
+  end
+  
+  get "/smartphone" do
+    protected!
+    @config = "sinatra"
+    @prefix = ""
     erb :smartphone
   end
   
@@ -433,9 +512,25 @@ class MyApp < Sinatra::Application
     ret << place_folder.gsub("#href#","/musicdb_dev/manage/update_db").gsub("#link#",'update_db')
   end
 
+  get "/manage" do
+    protected!
+    @prefix = ""
+    ret = ["<h1>manage page</h1>"]
+    place_folder = "<li><a href='#href#' target='_blank'>#link#</a>"
+    ret << place_folder.gsub("#href#","/manage/update_db").gsub("#link#",'update_db')
+  end
+
   get "#{get_prefix}/manage/update_db" do
     protected!
     @prefix = get_prefix
+    ret = ["<h1>DONE:musicdb/manage/updatet_db</h1>"]
+    ret = (ret + Musicmodel.update_db).flatten
+    ret.join("<li>")
+  end
+
+  get "/manage/update_db" do
+    protected!
+    @prefix = ""
     ret = ["<h1>DONE:musicdb/manage/updatet_db</h1>"]
     ret = (ret + Musicmodel.update_db).flatten
     ret.join("<li>")
@@ -469,6 +564,29 @@ class MyApp < Sinatra::Application
     end
   end
 
+  get "/api/genres" do
+    rets = cache( "genres", :expires_in => 0 ) do
+      Genremodel.all.only(:id,:name,:models_count).asc(:name)
+    end
+    expires 0
+    cache_control :public, 0
+    content_type  'application/json; charset=utf-8'
+    if rets.nil?
+      [{:status => "ng",:total => 0,:next => 'no'},[{}]].to_json
+    else
+      ret = []
+      rets.each do |e|
+        elem = {}
+        elem[:id] = e.id;
+        elem[:name]  = "#{e.name}"
+        elem[:num] = e.models_count
+        elem[:name2] = "#{e.name}(#{elem[:num]})"
+        ret << elem
+      end
+      [{:status => "ok",:next => 'no',:total => rets.size },ret].to_json
+    end
+  end
+
   ### static #############
   get "#{get_prefix}/scripts/application.js" do #,:cache => true do
     @prefix = get_prefix
@@ -480,8 +598,25 @@ class MyApp < Sinatra::Application
     erb :'scripts/application' 
   end
 
+  get "/scripts/application.js" do
+    @prefix = ""
+    etime = 0
+    expires etime
+    cache_control :public, etime
+    content_type 'application/javascript'  
+    erb :'scripts/application' 
+  end
+
   get "#{get_prefix}/scripts/swf.js" do #,:cache => true do
     @prefix = get_prefix
+    expires 0
+    cache_control :public, 0
+    content_type 'application/javascript'
+    erb :'scripts/swf'
+  end
+
+  get "/scripts/swf.js" do
+    @prefix = ""
     expires 0
     cache_control :public, 0
     content_type 'application/javascript'
@@ -496,8 +631,24 @@ class MyApp < Sinatra::Application
     erb :'scripts/jsfiles'
   end
 
+  get "/scripts/jsfiles.js" do
+    @prefix = ""
+    expires 0
+    cache_control :public, 0
+    content_type 'application/javascript'
+    erb :'scripts/jsfiles'
+  end
+
   get "#{get_prefix}/scripts/jquery.prettyphoto.js" do # ,:cache => true do
     @prefix = get_prefix
+    expires 0
+    cache_control :public, 0
+    content_type  'application/javascript'
+    erb :'scripts/jquery.prettyphoto'
+  end
+
+  get "/scripts/jquery.prettyphoto.js" do
+    @prefix = ""
     expires 0
     cache_control :public, 0
     content_type  'application/javascript'
@@ -512,8 +663,24 @@ class MyApp < Sinatra::Application
     erb :'css/pc'
   end
 
+  get "/css/pc.css" do
+    @prefix = ""
+    expires 0
+    cache_control :public, 0
+    content_type 'text/css'
+    erb :'css/pc'
+  end
+
   get "#{get_prefix}/css/swf.css" do
     @prefix = get_prefix
+    expires 0
+    cache_control :public, 0
+    content_type 'text/css'
+    erb :'css/swf'
+  end
+
+  get "/css/swf.css" do
+    @prefix = ""
     expires 0
     cache_control :public, 0
     content_type 'text/css'
@@ -528,8 +695,24 @@ class MyApp < Sinatra::Application
     erb :'css/prettyPhoto'
   end
 
+  get "/css/prettyPhoto.css" do
+    @prefix = ""
+    expires 0
+    cache_control :public, 0
+    content_type 'text/css'
+    erb :'css/prettyPhoto'
+  end
+
   get "#{get_prefix}/css/jquery.mobile.css" do
     @prefix = get_prefix
+    expires 0
+    cache_control :public, 0
+    content_type 'text/css'
+    erb :'css/jquery.mobile'
+  end
+
+  get "/css/jquery.mobile.css" do
+    @prefix = ""
     expires 0
     cache_control :public, 0
     content_type 'text/css'
@@ -544,8 +727,24 @@ class MyApp < Sinatra::Application
     erb :'css/smartphone'
   end
 
+  get "/css/smartphone.css" do
+    @prefix = ""
+    expires 0
+    cache_control :public, 0
+    content_type 'text/css'
+    erb :'css/smartphone'
+  end
+
   get "#{get_prefix}/js/jquery.js" do
     @prefix = get_prefix
+    expires 0
+    cache_control :public, 0
+    content_type  'application/javascript'
+    erb :'js/jquery'
+  end
+
+  get "/js/jquery.js" do
+    @prefix = ""
     expires 0
     cache_control :public, 0
     content_type  'application/javascript'
@@ -560,6 +759,14 @@ class MyApp < Sinatra::Application
     erb :'js/jquery.mobile'
   end
 
+  get "/js/jquery.mobile.js" do
+    @prefix = ""
+    expires 0
+    cache_control :public, 0
+    content_type  'application/javascript'
+    erb :'js/jquery.mobile'
+  end
+
   get "#{get_prefix}/js/smartphone.js" do
     @prefix = get_prefix
     expires 0
@@ -568,7 +775,20 @@ class MyApp < Sinatra::Application
     erb :'js/smartphone'
   end
 
+  get "/js/smartphone.js" do
+    @prefix = ""
+    expires 0
+    cache_control :public, 0
+    content_type  'application/javascript'
+    erb :'js/smartphone'
+  end
+
   get "#{get_prefix}/css/images/:path" do 
+    filepath = File.dirname(__FILE__) + "/views/css/images/" + params[:path]
+    send_file filepath
+  end
+
+  get "/css/images/:path" do 
     filepath = File.dirname(__FILE__) + "/views/css/images/" + params[:path]
     send_file filepath
   end
@@ -594,6 +814,24 @@ class MyApp < Sinatra::Application
     end
   end
 
+  get "/api/search" do
+    cache_control :public, :max_age => 1
+    expires 1
+    page = params[:p] ||= 1
+    page = page.to_i
+    per  = params[:per] ||= 10
+    per = per.to_i
+    content_type  'application/json; charset=utf-8'
+    require 'kconv'
+    qs = params[:qs].toutf8
+    if qs == 'recent'
+      recent(qs).to_json
+    else
+      ret =   Musicmodel.search(qs.gsub('<OR>','|'),page,per)
+      ret.to_json
+    end
+  end
+
   get "#{get_prefix}/api/search_by_genre" do
     cache_control :public, :max_age => 0
     expires 0
@@ -609,6 +847,20 @@ class MyApp < Sinatra::Application
     rets.to_json
   end
 
+  get "/api/search_by_genre" do
+    cache_control :public, :max_age => 0
+    expires 0
+    page = params[:p] ||= 1
+    page = page.to_i
+    per  = params[:per] ||= 10
+    per = per.to_i
+    rets = cache( "search_by_genre_#{params[:qs]}_#{params[:p]}_#{params[:per]}", :expires_in => 3600000 ) do
+      Musicmodel.search_by_genre(params[:qs].gsub('<OR>','|'),page,per)
+    end
+    content_type  'application/json; charset=utf-8'
+    rets.to_json
+  end
+
   post "#{get_prefix}/api/gzip" do
     protected!
     begin
@@ -616,6 +868,36 @@ class MyApp < Sinatra::Application
       ids = params[:qs].split(' ')
       rets = Musicmodel.where(:_id.in => ids)
 
+      path = nil
+      tmp = Tempfile.open(["music_pack_",'.tar.gz'],'/tmp') do |io|
+        path = io.path
+      end
+      dirname = nil
+      Dir.mktmpdir do |dir|
+        seri = 0
+        rets.each do |music|
+          request.logger.info music.path
+          # musicのpathに実際の格納場所がセットされている。
+          filename = "p#{seri}_#{File.basename(music.path)}"
+          seri = seri + 1
+          FileUtils.cp(music.path, "#{dir}/#{filename}")
+        end
+        system "tar -czf #{path} #{dir}"
+     end
+     content_type 'application/gzip'
+     send_file path ,:filename => 'musicdb_pack.tar.gz'
+     FileUtils.rm(path)
+    rescue => ex
+      request.logger.fatal ex.to_s
+    end
+  end
+
+  post "/api/gzip" do
+    protected!
+    begin
+      require "tmpdir"
+      ids = params[:qs].split(' ')
+      rets = Musicmodel.where(:_id.in => ids)
       path = nil
       tmp = Tempfile.open(["music_pack_",'.tar.gz'],'/tmp') do |io|
         path = io.path
@@ -672,8 +954,59 @@ class MyApp < Sinatra::Application
     end
   end
 
+  post "/api/tar" do
+    protected!
+    begin
+      require "tmpdir"
+      ids = params[:qs].split(' ')
+      rets = Musicmodel.where(:_id.in => ids)
+      path = nil
+      tmp = Tempfile.open(["music_pack_",'.tar'],'/tmp') do |io|
+        path = io.path
+      end
+      dirname = nil
+      Dir.mktmpdir do |dir|
+        seri = 0
+        rets.each do |music|
+          request.logger.info music.path
+          # musicのpathに実際の格納場所がセットされている。
+          filename = "p#{seri}_#{File.basename(music.path)}"
+          seri = seri + 1
+          FileUtils.cp(music.path, "#{dir}/#{filename}")
+        end
+        system "tar -cf #{path} #{dir}"
+     end
+     content_type 'application/tar'
+     send_file path ,:filename => 'musicdb_pack.tar'
+     FileUtils.rm(path)
+    rescue => ex
+      request.logger.fatal ex.to_s
+    end
+  end
+
   post "#{get_prefix}/api/m3u" do
 
+    begin
+      require 'digest'
+      ids = params[:qs].split(' ')
+      puts ids
+      buf = []
+      rets = cache( "m3u_#{Digest::MD5.hexdigest params[:qs]}", :expires_in => 3600000 ) do
+        Musicmodel.where(:_id.in => ids)
+      end
+      rets.each do |music|
+        buf << make_m3u_elem(music)
+      end
+      path = get_tmpfile do
+        buf.join('')
+      end
+      send_file path ,:type => 'audio/x-mpegurl'
+    rescue => ex
+      [{:status => "ng",:ex => ex.to_s},[{}]].to_json
+    end
+  end
+
+  post "/api/m3u" do
     begin
       require 'digest'
       ids = params[:qs].split(' ')
@@ -703,6 +1036,15 @@ class MyApp < Sinatra::Application
     {:status => "ok" ,:msg => "Thank you."}.to_json
   end
 
+  get "/api/statistics" do
+    begin
+      Statistics.new(:name => params[:name],:kind => "web",:music_id => params[:mid].to_s).save
+    rescue
+    end
+    content_type  'application/json; charset=utf-8'
+    {:status => "ok" ,:msg => "Thank you."}.to_json
+  end
+
   get "#{get_prefix}/api/stream2/:mid/*"  do
     ok_ip?
 
@@ -723,6 +1065,25 @@ class MyApp < Sinatra::Application
       #    x_send_file music.path.gsub("/var/smb/sdb1","/resource")
       x_send_file music.path ,:type => "audio/#{type}"
       #send_file music.path ,:type => "audio/#{type}"
+    end
+  end
+
+  get "/api/stream2/:mid/*"  do
+    ok_ip?
+    music = Musicmodel.find(params[:mid])
+    cache_control :public, :max_age => 60* 60 * 12
+    expires 60* 60 * 12 ,:public
+    if music.nil?
+      send_file "/var/smb/sdb1/music/iTunes1/ASIAN KUNG-FU GENERATION/Fanclub/02 World Apart.mp3" ,:type => 'audio/mp3'
+    else
+      type = File.extname(music.path).gsub('.','')
+      if type == 'm4a'
+        type = 'mp4'
+      elsif type == 'mp3'
+        type = 'mpeg'
+      end
+      puts music.path.gsub("/var/smb/sdb1","/resource")
+      x_send_file music.path ,:type => "audio/#{type}"
     end
   end
 
@@ -755,13 +1116,10 @@ class MyApp < Sinatra::Application
     end
   end
 
-  get "/stream/musicdb/:mid/*" do
-    ok_ip?
-
+  get "/api/stream/:mid/*" do
     music = Musicmodel.find(params[:mid])
     cache_control :public, :max_age => 60* 60 * 12
     expires 60* 60 * 12
-
     if music.nil?
       send_file "/var/smb/sdb1/music/iTunes1/ASIAN KUNG-FU GENERATION/Fanclub/02 World Apart.mp3" ,:type => 'audio/mp3'
     else
@@ -779,14 +1137,47 @@ class MyApp < Sinatra::Application
       elsif type == 'mp3'
         type = 'mpeg'
       end
-#      x_send_file music.path ,:type => "audio/#{type}"
       send_file music.path ,:type => "audio/#{type}"
-      #x_send_file music.path.gsub("/var/smb/sdb1","/resource")
+    end
+  end
+
+  get "/stream/musicdb/:mid/*" do
+    ok_ip?
+    music = Musicmodel.find(params[:mid])
+    cache_control :public, :max_age => 60* 60 * 12
+    expires 60* 60 * 12
+    if music.nil?
+      send_file "/var/smb/sdb1/music/iTunes1/ASIAN KUNG-FU GENERATION/Fanclub/02 World Apart.mp3" ,:type => 'audio/mp3'
+    else
+      begin
+        Statistics.new(
+                       :name => "M3U:" + music.title + " - " + music.artist + " - " + music.title ,
+                       :kind => "m3u",
+                       :music_id => music._id
+                       ).save
+      rescue
+      end
+      type = File.extname(music.path).gsub('.','')
+      if type == 'm4a'
+        type = 'mp4'
+      elsif type == 'mp3'
+        type = 'mpeg'
+      end
+      send_file music.path ,:type => "audio/#{type}"
     end
 
   end
 
   get "#{get_prefix}/api/backjpg" do
+    cache_control :public, :max_age => 180;
+    expires 180
+    @files = Dir.glob(File.dirname(__FILE__) + "/public/back/*.jpg")  
+    seed = rand(@files.size).to_i
+    path = @files[seed]
+    send_file path
+  end
+
+  get "/api/backjpg" do
     cache_control :public, :max_age => 180;
     expires 180
     @files = Dir.glob(File.dirname(__FILE__) + "/public/back/*.jpg")  
@@ -803,7 +1194,31 @@ class MyApp < Sinatra::Application
     {:midskey => mids.id,:mids => mids.mids}.to_json
   end
 
+  post "/api/files/set_mids" do
+    content_type  'application/json; charset=utf-8'
+    mids = Mid.new(:mids => params[:mids].split(' '))
+    mids.save
+    {:midskey => mids.id,:mids => mids.mids}.to_json
+  end
+
   post "#{get_prefix}/api/files/set_store" do
+    content_type  'application/json; charset=utf-8'
+    id = params[:midskey]
+    mids = nil
+    mret = [].to_json
+    begin
+      mids = Mid.find(id)
+      mt = Musicmodel.where(:_id.in => mids.mids ).only(:_id,:title,:album,:genre,:artist,:tag,:path,:ext).to_a.map {|e|"#{e.genre}-#{e.artist}-#{e.album}-#{e.title}" }
+      stored = Stored.new(:midsid => mids._id.to_s,:titles => mt,:created_at => Time.new)
+      stored.save
+      {:status => "ok" , :msg => "stored." ,:storedid => stored._id}.to_json
+    rescue => ex
+      puts ex
+      {:status => "ng" , :msg => "not stored." }.to_json
+    end
+  end
+
+  post "/api/files/set_store" do
     content_type  'application/json; charset=utf-8'
     id = params[:midskey]
     mids = nil
@@ -832,7 +1247,42 @@ class MyApp < Sinatra::Application
     end
   end
 
+  get "/api/files/set_store/delete/:id" do
+    content_type  'application/json; charset=utf-8'
+    begin
+      stored = Stored.find(params[:id])
+      stored.delete
+      {:status => "ok" , :msg => "deleted."}.to_json
+    rescue => ex
+      puts ex
+      {:status => "ng" , :msg => "not deleted." }.to_json
+    end
+  end
+
   get "#{get_prefix}/api/files/generate_midskey_from" do
+    content_type  'application/json; charset=utf-8'
+    begin
+      cou = Musicmodel.where(:artist => params[:artist]).count
+      seed = rand(cou) 
+      l = 20
+      if seed + l >= cou
+        seed = cou - l
+      end
+      seed = 0 if  seed < 0
+      mids = Musicmodel.where(:artist => params[:artist]).only(:id).skip(seed).limit(l).to_a.map{|e| e.id}
+      if(mids.size > 0)
+        mids = Mid.new(:mids => mids)
+        mids.save
+        {:status=>"ok",:midskey => mids.id,:mids => mids.mids}.to_json
+      else
+        {:status=>"ng",:message => "no entry #{seed} #{cou} "}.to_json
+      end
+    rescue => ex
+      {:status=>"ng" ,:message => ex.to_s}.to_json
+    end
+  end
+
+  get "/api/files/generate_midskey_from" do
     content_type  'application/json; charset=utf-8'
     begin
       cou = Musicmodel.where(:artist => params[:artist]).count
@@ -868,12 +1318,44 @@ class MyApp < Sinatra::Application
     ret
   end
 
+  get "/api/files/get_mids" do
+    content_type  'application/json; charset=utf-8'
+    mids = nil
+    begin
+      mids = Mids.find(id)
+    rescue => ex
+      halt {}.to_json
+    end
+    ret = mids.mids.to_json
+    mids.delete
+    ret
+  end
+
   ### API SCRAPTE #####################
   get "#{get_prefix}/api/scrape/amazon" do 
     content_type  'application/json; charset=utf-8'
     cache_control :public, :max_age => 60* 60 * 12
     expires 60* 60 * 12
 
+    agent = Mechanize.new
+    artist = params[:artist].gsub(/^\s*\d+\s*/,'')
+    album = params[:album].gsub(/^\s*\d+\s*/,'')
+    url = "http://www.amazon.co.jp/s/ref=nb_sb_noss?__mk_ja_JP=%83J%83%5E%83J%83i&url=search-alias%3Dpopular&field-keywords=#{URI.escape artist.to_s.tosjis}+#{URI.escape album.to_s.tosjis}&x=0&y=0"
+    imgpath = "/musicdb/cd.gif"
+    status = "ng"
+    begin
+      agent.get url
+      imgpath = agent.page.search("div#Results img").map{|e| e["src"]}.select{|e| e=~/http\:\/\/ecx/}.first.gsub(/\_.+_\.jpg/,'.jpg')
+      status = "ok"
+    rescue
+    end
+    {:status => status,:src => imgpath,:url => url}.to_json
+  end
+
+  get "/api/scrape/amazon" do 
+    content_type  'application/json; charset=utf-8'
+    cache_control :public, :max_age => 60* 60 * 12
+    expires 60* 60 * 12
     agent = Mechanize.new
     artist = params[:artist].gsub(/^\s*\d+\s*/,'')
     album = params[:album].gsub(/^\s*\d+\s*/,'')
@@ -897,7 +1379,23 @@ class MyApp < Sinatra::Application
     {:html => rylic}.to_json
   end
 
+  get "/api/scrape/lyric" do 
+    content_type  'application/json; charset=utf-8'
+    cache_control :public, :max_age => 60* 60 * 120
+    expires 60* 60 * 120
+    rylic = get_lyric(params[:title],params[:artist])
+    {:html => rylic}.to_json
+  end
+
   get "#{get_prefix}/api/scrape/bio" do
+    content_type  'application/json; charset=utf-8'
+    rylic = get_bio2(params[:artist])
+    cache_control :public, :max_age => 60* 60 * 12
+    expires 60* 60 * 12
+    {:html => rylic,:status => rylic == "" ? :ng : :ok}.to_json
+  end
+
+  get "/api/scrape/bio" do
     content_type  'application/json; charset=utf-8'
     rylic = get_bio2(params[:artist])
     cache_control :public, :max_age => 60* 60 * 12
@@ -913,7 +1411,23 @@ class MyApp < Sinatra::Application
     {:html => rylic,:status => rylic == "" ? :ng : :ok}.to_json
   end
 
+  get "/api/scrape/wikipedia" do
+    content_type  'application/json; charset=utf-8'
+    cache_control :public, :max_age => 60* 60 * 12
+    expires 60* 60 * 12
+    rylic = get_wikipedia(params[:artist])
+    {:html => rylic,:status => rylic == "" ? :ng : :ok}.to_json
+  end
+
   get "#{get_prefix}/api/scrape/similar" do 
+    content_type  'application/json; charset=utf-8'
+    cache_control :public, :max_age => 60* 60 * 12
+    expires 60* 60 * 12
+    rylic = get_similar_artist_in_mongo({:artist => params[:artist] })
+    {:json => rylic,:status => rylic == [] ? :ng : :ok}.to_json
+  end
+
+  get "/api/scrape/similar" do 
     content_type  'application/json; charset=utf-8'
     cache_control :public, :max_age => 60* 60 * 12
     expires 60* 60 * 12
@@ -926,12 +1440,26 @@ class MyApp < Sinatra::Application
     send_file "/var/smb/sdb1/music/iTunesMac/Vocaloid/impacts/02.mp3"
   end
 
+  get "/test/02mp3" do
+    send_file "/var/smb/sdb1/music/iTunesMac/Vocaloid/impacts/02.mp3"
+  end
+
   get "#{get_prefix}/test/01mp3" do
     #  x_send_file "/var/www/resource/music/iTunesLossless/mp3/新谷良子 -/03. crossingdays (OFF VOCAL).mp3"
     x_send_file "/resource/music/iTunesLossless/mp3/新谷良子 -/03. crossingdays (OFF VOCAL).mp3"
   end
 
+  get "/test/01mp3" do
+    x_send_file "/resource/music/iTunesLossless/mp3/新谷良子 -/03. crossingdays (OFF VOCAL).mp3"
+  end
+
   get "#{get_prefix}/:file" do
+    cache_control :public, :max_age => 60* 60 * 12
+    expires 60 * 60 * 24
+    send_file File.dirname(__FILE__) + "/public/"  + params[:file]
+  end
+
+  get "/:file" do
     cache_control :public, :max_age => 60* 60 * 12
     expires 60 * 60 * 24
     send_file File.dirname(__FILE__) + "/public/"  + params[:file]
@@ -943,13 +1471,31 @@ class MyApp < Sinatra::Application
     send_file File.dirname(__FILE__) + "/public/images/prettyPhoto/light_rounded/"  + params[:file]
   end
 
+  get "/images/prettyPhoto/light_rounded/:file" do 
+    cache_control :public, :max_age => 60* 60 * 12
+    expires 60 * 60 * 24
+    send_file File.dirname(__FILE__) + "/public/images/prettyPhoto/light_rounded/"  + params[:file]
+  end
+
   get "#{get_prefix}/images/prettyPhoto/default/:file" do 
     cache_control :public, :max_age => 60* 60 * 12
     expires 60 * 60 * 24
     send_file File.dirname(__FILE__) + "/public/images/prettyPhoto/default/"  + params[:file]
   end
 
+  get "/images/prettyPhoto/default/:file" do 
+    cache_control :public, :max_age => 60* 60 * 12
+    expires 60 * 60 * 24
+    send_file File.dirname(__FILE__) + "/public/images/prettyPhoto/default/"  + params[:file]
+  end
+
   get "#{get_prefix}/images/:file" do
+    cache_control :public, :max_age => 60* 60 * 12
+    expires 60 * 60 * 24
+    send_file File.dirname(__FILE__) + "/public/images/"  + params[:file]
+  end
+
+  get "/images/:file" do
     cache_control :public, :max_age => 60* 60 * 12
     expires 60 * 60 * 24
     send_file File.dirname(__FILE__) + "/public/images/"  + params[:file]
