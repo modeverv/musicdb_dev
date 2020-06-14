@@ -32,8 +32,8 @@ class GlobServerFiles
 #      "/var/smb/sde1/sdb1/music/iTunes2017",
 #      "/var/smb/sde1/sdb1/music/iTunes2018",
 #      "/var/smb/sde1/sdb1/music/iTunes2019",
-      "/var/smb/sde1/sdb1/music/iTunes2020",
-      "/var/smb/sde1/sdb1/music/2020",
+#      "/var/smb/sde1/sdb1/music/iTunes2020",
+#      "/var/smb/sde1/sdb1/music/2020",
 #      "/var/smb/sdc1/music",                                    
 #      "/var/smb/sde1/sdb1/music/iTunesLossless",
 
@@ -47,8 +47,11 @@ class GlobServerFiles
 #      "/var/smb/sdb1/music/iTunes2017",
 #      "/var/smb/sdb1/music/iTunes2018",
 #      "/var/smb/sdb1/music/iTunes2019",
-      "/var/smb/sde1/music/iTunes2020",
-      "/var/smb/sde1/music/2020",
+#      "/var/smb/sde1/music/iTunes2020",
+#      "/var/smb/sde1/music/2020",
+
+      "/var/smb/sdb1/music/iTunes2020",
+      "/var/smb/sdb1/music/2020",
 
       
     ]
