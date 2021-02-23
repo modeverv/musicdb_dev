@@ -52,8 +52,7 @@ class GlobServerFiles
 
       "/var/smb/sdb1/music/iTunes2020",
       "/var/smb/sdb1/music/2020",
-
-      
+      "/var/smb/sdb1/music/2021",
     ]
     @ext = args[:ext] ||= [
                            'MP3',
