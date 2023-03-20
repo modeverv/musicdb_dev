@@ -5,7 +5,7 @@ class GlobServerFiles
   def initialize args={}
     @count = 0
     @folders = args[:folders] ||= [
-##      "/var/smb/sdb1/music",
+#      "/var/smb/sdb1/music",
 #      "/var/smb/sdb1/music/iTunes",
 #      "/var/smb/sdb1/music/iTunes1",
 #      "/var/smb/sdb1/music/iTunes2",
@@ -15,12 +15,11 @@ class GlobServerFiles
 #      "/var/smb/sdb1/music/iTunes2016",
 #      "/var/smb/sdb1/music/iTunes2017",
 #      "/var/smb/sdb1/music/iTunes2018",
-
-#      "/var/smb/sdb1/music/iTunesLossless",      
 #      "/var/smb/sdb1/music/iTunes2019",
 #      "/var/smb/sdb1/music/iTunes2020",
+#      "/var/smb/sdb1/music/iTunesLossless",      
+
 #      "/var/smb/sdb1/music/English",
-#      "/var/smb/sdc1/music",
 
 #      "/var/smb/sde1/sdb1/music/iTunes",      
 #      "/var/smb/sde1/sdb1/music/iTunes1",
@@ -38,21 +37,27 @@ class GlobServerFiles
 #      "/var/smb/sde1/sdb1/music/iTunesLossless",
 
 #      "/var/smb/sdb1/music/iTunes",      
+
 #      "/var/smb/sdb1/music/iTunes1",
+
 #      "/var/smb/sdb1/music/iTunes2",
+
 #      "/var/smb/sdb1/music/iTunes3",
+
 #      "/var/smb/sdb1/music/iTunes2014",
 #      "/var/smb/sdb1/music/iTunes2015",
 #      "/var/smb/sdb1/music/iTunes2016",
 #      "/var/smb/sdb1/music/iTunes2017",
+
 #      "/var/smb/sdb1/music/iTunes2018",
 #      "/var/smb/sdb1/music/iTunes2019",
 #      "/var/smb/sde1/music/iTunes2020",
-#      "/var/smb/sde1/music/2020",
 
-      "/var/smb/sdb1/music/iTunes2020",
-      "/var/smb/sdb1/music/2020",
-      "/var/smb/sdb1/music/2021",
+#      "/var/smb/sdb1/music/lossless_not_mka",      
+#      "/var/smb/sdb1/music/2020",
+
+#      "/var/smb/sdb1/music/2021",
+       "/var/smb/sdb1/music/2023",      
     ]
     @ext = args[:ext] ||= [
                            'MP3',

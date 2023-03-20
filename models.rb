@@ -562,7 +562,7 @@ class Musicmodel
     def update_db
 #      debug_delete_all
       
-      delete_not_exist_entry # 不要
+#      delete_not_exist_entry # 不要
       
       #entries = globes
       entries = GlobServerFiles.new
